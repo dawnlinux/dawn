@@ -25,3 +25,9 @@ h1.layer_rule({
 	animation = "slide bottom",
 	dim_around = true,
 })
+
+h1.layer_rule({
+	name = "notifications-animations",
+	match = { namespace = "swaync-control-center" },
+	animation = "slide right",
+})

@@ -27,7 +27,7 @@ rindings = {
     { mods = "SUPER SHIFT", key = "O", action = "exec", command = "obsidian" },
     { mods = "SUPER SHIFT", key = "W", action = "exec", command = "typora --enable-wayland-ime" },
     { mods = "SUPER SHIFT", key = "SLASH", action = "exec", command = "1password" },
-    { mods = "SUPER", key = "R", action = "exec", command = "!/.config/waybar/launch.sh" },
+    { mods = "SUPER", key = "R", action = "exec", command = "./.config/waybar/launch.sh" },
 
     -- Web apps
     { mods = "SUPER SHIFT", key = "A", action = "exec", command = "firefox --new-window \"https://chatgpt.com\"" },
