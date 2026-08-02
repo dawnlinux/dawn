@@ -20,9 +20,9 @@ rindings = {
     { mods = "SUPER SHIFT", key = "B", action = "exec", command = "firefox" },
     { mods = "SUPER SHIFT ALT", key = "B", action = "exec", command = "firefox --private-window" },
     { mods = "SUPER SHIFT", key = "M", action = "exec", command = "spotify" },
-    { mods = "SUPER SHIFT ALT", key = "M", action = "exec", command = "alacritty -e cmus" },
+    { mods = "SUPER SHIFT ALT", key = "M", action = "exec", command = "kitty -e cmus" },
     { mods = "SUPER SHIFT", key = "N", action = "exec", command = "nvim" },
-    { mods = "SUPER SHIFT", key = "D", action = "exec", command = "alacritty -e lazydocker" },
+    { mods = "SUPER SHIFT", key = "D", action = "exec", command = "kitty -e lazydocker" },
     { mods = "SUPER SHIFT", key = "G", action = "exec", command = "signal-desktop" },
     { mods = "SUPER SHIFT", key = "O", action = "exec", command = "obsidian" },
     { mods = "SUPER SHIFT", key = "W", action = "exec", command = "typora --enable-wayland-ime" },
@@ -42,7 +42,7 @@ rindings = {
     { mods = "SUPER SHIFT ALT", key = "X", action = "exec", command = "firefox --new-window \"https://x.com/compose/post\"" },
 
     -- Add extra bindings
-    -- { mods = "SUPER SHIFT", key = "R", action = "exec", command = "alacritty -e ssh your-server" },
+    -- { mods = "SUPER SHIFT", key = "R", action = "exec", command = "kitty -e ssh your-server" },
 
     -- Overwrite existing bindings
     -- unbind = "SUPER, SPACE"
