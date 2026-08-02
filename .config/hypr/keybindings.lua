@@ -10,7 +10,7 @@ local menu = "walker"
 -- ============================================
 -- BINDINGS
 -- ============================================
-bindings = {
+rindings = {
     -- Application bindings
     { mods = "SUPER", key = "RETURN", action = "exec", command = "xdg-terminal-exec --dir=\"$(pwd)\"" },
     { mods = "SUPER ALT", key = "RETURN", action = "exec", command = "xdg-terminal-exec --dir=\"$(pwd)\" bash -c \"tmux attach || tmux new -s Work\"" },
@@ -27,6 +27,7 @@ bindings = {
     { mods = "SUPER SHIFT", key = "O", action = "exec", command = "obsidian" },
     { mods = "SUPER SHIFT", key = "W", action = "exec", command = "typora --enable-wayland-ime" },
     { mods = "SUPER SHIFT", key = "SLASH", action = "exec", command = "1password" },
+    { mods = "SUPER", key = "R", action = "exec", command = "!/.config/waybar/launch.sh" },
 
     -- Web apps
     { mods = "SUPER SHIFT", key = "A", action = "exec", command = "firefox --new-window \"https://chatgpt.com\"" },
