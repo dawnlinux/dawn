@@ -5,7 +5,7 @@
 -- Set programs that you use
 local terminal = "kitty"
 local fileManager = "nautilus"
-local menu = "walker"
+local menu = "./.config/rofi/type-3/launcher.sh"
 
 -- ============================================
 -- BINDINGS
