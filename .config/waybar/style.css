@@ -34,7 +34,8 @@ window#waybar {
 
 .modules-center {
     background: @glass_surface_dark;
-    border-radius: 20px;
+    /* border-radius: 20px; */
+    border-radius: 0 0 20px 20px;
     padding: 0 6px;
 }
 
