@@ -95,4 +95,18 @@ hl.bind("XF86KbdBrightnessDown",
 hl.bind(mainMod .. " + X", hl.dsp.window.pin(), { description = "Pin Window" })
 hl.bind(mainMod .. " + Y", hl.dsp.layout("togglesplit"), { description = "Toggle Window Split" })
 
+hl.bind(
+    mainMod .. " + D",
+    hl.dsp.exec_cmd([[
+        if hyprctl activewindow | grep -q 'floating: 0'; then
+            W=$(hyprctl monitors -j | jq '.[] | select(.focused) | ((.width / .scale) * 0.9) | floor')
+            H=$(hyprctl monitors -j | jq '.[] | select(.focused) | ((.height / .scale) * 0.9) | floor')
+            hyprctl --batch "dispatch hl.dsp.window.float({action='set'}); dispatch hl.dsp.window.resize({x=${W}, y=${H}, relative=false})"
+            hyprctl dispatch "hl.dsp.window.center()"
+        else
+            hyprctl dispatch "hl.dsp.window.float({action='unset'})"
+        fi
+    ]]),
+    { description = "Smart Float" }
+)
 
