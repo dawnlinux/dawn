@@ -9,7 +9,7 @@
 -- =============================================================
 
 local terminal    = "kitty"
-local fileManager  = "dolphin"
+local fileManager  = "nautilus"
 local menu         = "./.config/rofi/type-1/launcher.sh"
 
 local mainMod = "SUPER"
