@@ -13,6 +13,7 @@ local menu        = "./.config/rofi/type-1/launcher.sh"
 
 local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
+
 -- Example binds, see https://wiki.hypr.land/Configuring/Basics/Binds/ for more
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal))
 local closeWindowBind = hl.bind(mainMod .. " + W", hl.dsp.window.close())
@@ -20,6 +21,7 @@ local closeWindowBind = hl.bind(mainMod .. " + W", hl.dsp.window.close())
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + T", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/waybar/launch.sh"))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
@@ -69,3 +71,20 @@ hl.bind("XF86AudioPrev",  hl.dsp.exec_cmd("playerctl previous"),   { locked = tr
 -- Global clipboard
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("wtype -M ctrl -M shift c -m shift -m ctrl"))
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("wtype -M ctrl -M shift v -m shift -m ctrl"))
+
+-- Screenshot
+hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("flameshot full"))
+
+-- Open browser
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("firefox"))
+
+-- Mac keyboard backlight
+hl.bind("XF86KbdBrightnessUp",
+    hl.dsp.exec_cmd("brightnessctl --device='smc::kbd_backlight' set +10%"),
+    { locked = true, repeating = true }
+)
+
+hl.bind("XF86KbdBrightnessDown",
+    hl.dsp.exec_cmd("brightnessctl --device='smc::kbd_backlight' set 10%-"),
+    { locked = true, repeating = true }
+)
