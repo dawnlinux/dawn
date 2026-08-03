@@ -110,3 +110,8 @@ hl.bind(
     { description = "Smart Float" }
 )
 
+hl.bind(
+    "SUPER + SHIFT + D",
+    hl.dsp.window.pseudo({ action = "toggle" }),
+    { description = "Toggle Pseudo" }
+)
