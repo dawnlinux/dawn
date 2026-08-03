@@ -1,0 +1,4 @@
+shell /usr/bin/zsh
+
+disable_ligatures never
+allow_remote_control yes
