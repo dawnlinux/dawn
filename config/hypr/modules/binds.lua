@@ -34,6 +34,11 @@ hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
 hl.bind(mainMod .. " + up",    hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + down",  hl.dsp.focus({ direction = "down" }))
 
+
+-- =============================
+-- Workspace management
+-- =============================
+
 -- Switch workspaces with mainMod + [0-9]
 -- Move active window to a workspace with mainMod + SHIFT + [0-9]
 for i = 1, 10 do
@@ -41,6 +46,12 @@ for i = 1, 10 do
     hl.bind(mainMod .. " + " .. key,             hl.dsp.focus({ workspace = i}))
     hl.bind(mainMod .. " + SHIFT + " .. key,     hl.dsp.window.move({ workspace = i }))
 end
+
+hl.bind(
+    "SUPER + TAB",
+    hl.dsp.focus({ workspace = "previous" }),
+    { description = "Last Workspace", repeating = true }
+)
 
 -- Example special workspace (scratchpad)
 hl.bind(mainMod .. " + S",         hl.dsp.workspace.toggle_special("magic"))
@@ -193,3 +204,4 @@ hl.bind(
     hl.dsp.window.resize({ x = 0, y = 30, relative = true }),
     { description = "Resize Height +", repeating = true }
 )
+-- ========================================================================================
