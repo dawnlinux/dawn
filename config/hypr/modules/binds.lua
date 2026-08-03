@@ -88,3 +88,11 @@ hl.bind("XF86KbdBrightnessDown",
     hl.dsp.exec_cmd("brightnessctl --device='smc::kbd_backlight' set 10%-"),
     { locked = true, repeating = true }
 )
+
+
+
+-- Advanced window management
+hl.bind(mainMod .. " + X", hl.dsp.window.pin(), { description = "Pin Window" })
+hl.bind(mainMod .. " + Y", hl.dsp.layout("togglesplit"), { description = "Toggle Window Split" })
+
+
