@@ -168,3 +168,28 @@ hl.bind(
     hl.dsp.window.move({ direction = "d" }),
     { description = "Move Down", repeating = true }
 )
+
+-- --- Window Resizing ---
+hl.bind(
+    "SUPER + right",
+    hl.dsp.window.resize({ x = 30, y = 0, relative = true }),
+    { description = "Resize Width +", repeating = true }
+)
+
+hl.bind(
+    "SUPER + left",
+    hl.dsp.window.resize({ x = -30, y = 0, relative = true }),
+    { description = "Resize Width -", repeating = true }
+)
+
+hl.bind(
+    "SUPER + up",
+    hl.dsp.window.resize({ x = 0, y = -30, relative = true }),
+    { description = "Resize Height -", repeating = true }
+)
+
+hl.bind(
+    "SUPER + down",
+    hl.dsp.window.resize({ x = 0, y = 30, relative = true }),
+    { description = "Resize Height +", repeating = true }
+)
