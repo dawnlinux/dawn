@@ -29,6 +29,13 @@
             "tooltip": false
         },
 
+        "custom/temp": {
+    	    "exec": "sensors | grep 'Package id 0' | awk '{print $4}'",
+    	    "interval": 5,
+    	    "format": " {}",
+    	    "tooltip": true
+	},
+
         "mpris": {
             "format": "{player_icon} {title}",
             "format-paused": "{status_icon} <i>{position} {artist}</i>",
@@ -130,6 +137,7 @@
                 "bluetooth",
                 "network",
                 "cpu",
+	    	"custom/temp",
                 "pulseaudio",
                 "custom/inhibit-suspend"
             ]
