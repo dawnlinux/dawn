@@ -25,7 +25,7 @@ hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/waybar/launch.sh"))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
-hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
+hl.bind(mainMod .. "+ SHIFT + J", hl.dsp.layout("togglesplit"))    -- dwindle only
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("swaync-client --toggle-panel"))
 
 -- Move focus with mainMod + arrow keys
@@ -90,8 +90,10 @@ hl.bind("XF86KbdBrightnessDown",
 )
 
 
-
+-- =============================
 -- Advanced window management
+-- =============================
+
 hl.bind(mainMod .. " + X", hl.dsp.window.pin(), { description = "Pin Window" })
 hl.bind(mainMod .. " + Y", hl.dsp.layout("togglesplit"), { description = "Toggle Window Split" })
 
@@ -114,4 +116,29 @@ hl.bind(
     "SUPER + SHIFT + D",
     hl.dsp.window.pseudo({ action = "toggle" }),
     { description = "Toggle Pseudo" }
+)
+
+-- --- Focus Movement ---
+hl.bind(
+    "SUPER + h",
+    hl.dsp.focus({ direction = "l" }),
+    { description = "Focus Left", repeating = true }
+)
+
+hl.bind(
+    "SUPER + l",
+    hl.dsp.focus({ direction = "r" }),
+    { description = "Focus Right", repeating = true }
+)
+
+hl.bind(
+    "SUPER + k",
+    hl.dsp.focus({ direction = "u" }),
+    { description = "Focus Up", repeating = true }
+)
+
+hl.bind(
+    "SUPER + j",
+    hl.dsp.focus({ direction = "d" }),
+    { description = "Focus Down", repeating = true }
 )
