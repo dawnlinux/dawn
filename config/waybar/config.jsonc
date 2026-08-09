@@ -1,300 +1,296 @@
 [
-    {
-        "position": "top",
-        "reload_style_on_change": true,
-        "margin-top": 0,
-        "modules-center": [
-            "custom/launcher",
-            "clock",
-            "group/mpris-drawer",
-            "hyprland/workspaces",
-            "group/hide-tray",
-            "group/battery-drawer",
-            "custom/notification",
-            "group/updates-drawer"
-        ],
+  {
+    "position": "top",
+    "reload_style_on_change": true,
+    "margin-top": 0,
+    "modules-center": [
+      "custom/launcher",
+      "clock",
+      "group/mpris-drawer",
+      "hyprland/workspaces",
+      "group/hide-tray",
+      "group/battery-drawer",
+      "custom/notification",
+      "group/updates-drawer",
+    ],
 
-        "group/mpris-drawer": {
-            "orientation": "inherit",
-            "drawer": {
-                "transition-duration": "0.3",
-                "children-class": "mpris-drawer",
-                "click-to-reveal": false
-            },
-            "modules": ["custom/mpris-trigger", "mpris"]
+    "group/mpris-drawer": {
+      "orientation": "inherit",
+      "drawer": {
+        "transition-duration": "0.3",
+        "children-class": "mpris-drawer",
+        "click-to-reveal": false,
+      },
+      "modules": ["custom/mpris-trigger", "mpris"],
+    },
+
+    "custom/mpris-trigger": {
+      "format": "♪",
+      "tooltip": false,
+    },
+
+    "custom/temp": {
+      "exec": "sensors | grep 'Package id 0' | awk '{print $4}'",
+      "interval": 5,
+      "format": " {}",
+      "tooltip": true,
+    },
+
+    "mpris": {
+      "format": "{player_icon} {title}",
+      "format-paused": "{status_icon} <i>{position} {artist}</i>",
+      "format-stopped": "",
+      "player-icons": {
+        "default": "",
+        "firefox": "",
+        "mpv": "",
+        "spotify": "",
+        "zen-bin": "󰗝",
+      },
+      "status-icons": {
+        "paused": "",
+      },
+      "max-length": 20,
+    },
+
+    "clock": {
+      "format": "{:%I:%M %p}",
+      "format-alt": "{:%a, %b %d}",
+      "tooltip-format": "<tt><span size='12pt' font='JetBrainsMono Nerd Font'>{calendar}</span></tt>",
+      "calendar": {
+        "mode": "month",
+        "mode-mon-col": 3,
+        "weeks-pos": "right",
+        "on-scroll": 1,
+        "format": {
+          "months": "<span color='#ffb786'><b>{}</b></span>",
+          "days": "<span color='#e2e2e2'>{}</span>",
+          "weeks": "<span color='#c9ca93'>W{}</span>",
+          "weekdays": "<span color='#ffb786'><b>{}</b></span>",
+          "today": "<span color='#131313' background='#ffb786'><b>{}</b></span>",
         },
+      },
+    },
 
-        "custom/mpris-trigger": {
-            "format": "♪",
-            "tooltip": false
-        },
+    "hyprland/workspaces": {
+      "format": "{icon}",
+      "format-icons": {
+        "default": "",
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5",
+        "6": "6",
+        "7": "7",
+        "8": "8",
+        "9": "9",
+        "10": "0",
+        "active": "󱓻",
+      },
+      "persistent-workspaces": {
+        "1": [],
+        "2": [],
+        "3": [],
+        "4": [],
+        "5": [],
+      },
+      "on-click": "activate",
+      "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
+      "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'",
+    },
 
-        "custom/temp": {
-    	    "exec": "sensors | grep 'Package id 0' | awk '{print $4}'",
-    	    "interval": 5,
-    	    "format": " {}",
-    	    "tooltip": true
-	},
+    "custom/launcher": {
+      "format": "",
+      "on-click": "~/.config/rofi/type-3/launcher.sh",
+      "on-click-right": "kitty",
+      "tooltip-format": "Application Launcher\n\nSuper + Space",
+    },
 
-        "mpris": {
-            "format": "{player_icon} {title}",
-            "format-paused": "{status_icon} <i>{position} {artist}</i>",
-            "format-stopped": "",
-            "player-icons": {
-                "default": "",
-                "firefox": "",
-                "mpv": "",
-                "spotify": "",
-                "zen-bin": "󰗝"
-            },
-            "status-icons": {
-                "paused": ""
-            },
-            "max-length": 20
-        },
+    "custom/update": {
+      "format": "",
+      "exec": "checkupdates 2>/dev/null | wc -l",
+      "on-click": "kitty --class floating-update -e sudo pacman -Syu",
+      "tooltip-format": "Updates available",
+      "signal": 7,
+      "interval": 21600,
+    },
 
-        "clock": {
-            "format": "{:%I:%M %p}",
-            "format-alt": "{:%a, %b %d}",
-            "tooltip-format": "<tt><span size='12pt' font='JetBrainsMono Nerd Font'>{calendar}</span></tt>",
-            "calendar": {
-                "mode": "month",
-                "mode-mon-col": 3,
-                "weeks-pos": "right",
-                "on-scroll": 1,
-                "format": {
-                    "months": "<span color='#ffb786'><b>{}</b></span>",
-                    "days": "<span color='#e2e2e2'>{}</span>",
-                    "weeks": "<span color='#c9ca93'>W{}</span>",
-                    "weekdays": "<span color='#ffb786'><b>{}</b></span>",
-                    "today": "<span color='#131313' background='#ffb786'><b>{}</b></span>"
-                }
-            }
-        },
+    "cpu": {
+      "interval": 5,
+      "format": "󰍛",
+      "on-click": "kitty --class floating-btop -e btop",
+      "on-click-right": "kitty",
+    },
 
-        "hyprland/workspaces": {
-            "format": "{icon}",
-            "format-icons": {
-                "default": "",
-                "1": "1",
-                "2": "2",
-                "3": "3",
-                "4": "4",
-                "5": "5",
-                "6": "6",
-                "7": "7",
-                "8": "8",
-                "9": "9",
-                "10": "0",
-                "active": "󱓻"
-            },
-            "persistent-workspaces": {
-                "1": [],
-                "2": [],
-                "3": [],
-                "4": [],
-                "5": []
-            },
-            "on-click": "activate",
-            "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
-            "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'"
-        },
+    "group/battery-drawer": {
+      "orientation": "inherit",
+      "drawer": {
+        "transition-duration": "0.3",
+        "children-class": "battery-drawer",
+        "click-to-reveal": false,
+        "transition-left-to-right": false,
+      },
+      "modules": [
+        "battery",
+        "backlight",
+        "bluetooth",
+        "network",
+        "cpu",
+        "custom/temp",
+        "pulseaudio",
+        "custom/inhibit-suspend",
+      ],
+    },
 
-        "custom/launcher": {
-            "format": "",
-            "on-click": "~/.config/rofi/type-1/launcher.sh",
-            "on-click-right": "kitty",
-            "tooltip-format": "Application Launcher\n\nSuper + Space"
-        },
+    "battery": {
+      "format": "{icon}",
+      "format-charging": "",
+      "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+      "interval": 5,
+      "tooltip-format": "Capacity: {capacity}%\n{timeTo}\nHealth: {health}%",
+      "on-click": "kitty --class floating-powertop -e sudo powertop",
+      "states": {
+        "warning": 20,
+        "critical": 10,
+      },
+    },
 
-        "custom/update": {
-            "format": "",
-            "exec": "checkupdates 2>/dev/null | wc -l",
-            "on-click": "kitty sudo pacman -Syu",
-            "tooltip-format": "Updates available",
-            "signal": 7,
-            "interval": 21600
-        },
+    "network": {
+      "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
+      "format": "{icon}",
+      "format-wifi": "{icon}",
+      "format-ethernet": "󰀂",
+      "format-disconnected": "󰤮",
+      "tooltip-format-wifi": "{essid} ({frequency} GHz)\n⇣{bandwidthDownBytes}  ⇡{bandwidthUpBytes}",
+      "tooltip-format-ethernet": "⇣{bandwidthDownBytes}  ⇡{bandwidthUpBytes}",
+      "tooltip-format-disconnected": "Disconnected",
+      "interval": 3,
+      "spacing": 1,
+      "on-click": "kitty --class floating-nmtui -e nmtui",
+    },
 
-        "cpu": {
-            "interval": 5,
-            "format": "󰍛",
-            "on-click": "kitty btop",
-            "on-click-right": "kitty"
-        },
+    "backlight": {
+      "format": "{icon}  {percent}",
+      "tooltip-format": "Brightness: {percent}%\n\n LMB  Brightness\n RMB  Night Light\n MMB  Shaders",
+      "on-click": "brightnessctl set +5%",
+      "on-click-right": "brightnessctl set 5%-",
+      "on-click-middle": "kitty ~/scripts/shader_menu.sh",
+      "on-scroll-up": "brightnessctl set +5%",
+      "on-scroll-down": "brightnessctl set 5%-",
+      "format-icons": ["󰃞", "󰃟", "󰃠"],
+    },
 
-        "group/battery-drawer": {
-            "orientation": "inherit",
-            "drawer": {
-                "transition-duration": "0.3",
-                "children-class": "battery-drawer",
-                "click-to-reveal": false,
-                "transition-left-to-right": false
-            },
-            "modules": [
-                "battery",
-                "backlight",
-                "bluetooth",
-                "network",
-                "cpu",
-	    	"custom/temp",
-                "pulseaudio",
-                "custom/inhibit-suspend"
-            ]
-        },
+    "bluetooth": {
+      "format": "󰂯",
+      "format-disabled": "󰂲",
+      "format-connected": "󰂱 {num_connections}",
+      "format-connected-battery": "󰂱 {device_battery_percentage}%",
+      "tooltip-format": "{controller_alias}\n{controller_address}\n\n{device_enumerate}",
+      "tooltip-format-connected": "{controller_alias}\n\n{device_enumerate}",
+      "on-click": "kitty --class floating-bluetui -e bluetui",
+    },
 
-        "battery": {
-            "format": "{icon}",
-            "format-charging": "",
-            "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
-            "interval": 5,
-            "tooltip-format": "Capacity: {capacity}%\n{timeTo}\nHealth: {health}%",
-            "on-click": "kitty powertop",
-            "states": {
-                "warning": 20,
-                "critical": 10
-            }
-        },
+    "pulseaudio": {
+      "format": "{icon}  {volume}%",
+      "format-muted": "",
+      "format-icons": {
+        "headphone": "",
+        "hands-free": "󰋋",
+        "headset": "󰋋",
+        "phone": "",
+        "phone-muted": "",
+        "portable": "",
+        "car": "",
+        "default": ["", "", ""],
+      },
+      "on-click": "pavucontrol",
+      "on-click-right": "pamixer -t",
+      "ignored-sinks": ["Easy Effects Sink"],
+    },
 
-        "network": {
-            "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
-            "format": "{icon}",
-            "format-wifi": "{icon}",
-            "format-ethernet": "󰀂",
-            "format-disconnected": "󰤮",
-            "tooltip-format-wifi": "{essid} ({frequency} GHz)\n⇣{bandwidthDownBytes}  ⇡{bandwidthUpBytes}",
-            "tooltip-format-ethernet": "⇣{bandwidthDownBytes}  ⇡{bandwidthUpBytes}",
-            "tooltip-format-disconnected": "Disconnected",
-            "interval": 3,
-            "spacing": 1,
-            "on-click": "kitty nmtui"
-        },
+    "tray": {
+      "spacing": 10,
+    },
 
-        "backlight": {
-            "format": "{icon}  {percent}",
-            "tooltip-format": "Brightness: {percent}%\n\n LMB  Brightness\n RMB  Night Light\n MMB  Shaders",
-            "on-click": "brightnessctl set +5%",
-            "on-click-right": "brightnessctl set 5%-",
-            "on-click-middle": "kitty ~/scripts/shader_menu.sh",
-            "on-scroll-up": "brightnessctl set +5%",
-            "on-scroll-down": "brightnessctl set 5%-",
-            "format-icons": ["󰃞", "󰃟", "󰃠"]
-        },
+    "custom/screenrecording-indicator": {
+      "on-click": "wf-recorder",
+      "exec": "~/.config/waybar/scripts/screen-recording.sh",
+      "signal": 8,
+      "return-type": "json",
+    },
 
-        "bluetooth": {
-            "format": "󰂯",
-            "format-disabled": "󰂲",
-            "format-connected": "󰂱 {num_connections}",
-            "format-connected-battery": "󰂱 {device_battery_percentage}%",
-            "tooltip-format": "{controller_alias}\n{controller_address}\n\n{device_enumerate}",
-            "tooltip-format-connected": "{controller_alias}\n\n{device_enumerate}",
-            "tooltip-format-enumerate-connected": "󰂱 {device_alias}",
-            "tooltip-format-enumerate-connected-battery": "󰂱 {device_alias} ({device_battery_percentage}%)",
-            "on-click": "blueman-manager"
-        },
+    "group/hide-tray": {
+      "orientation": "inherit",
+      "drawer": {
+        "transition-duration": "0.5",
+        "children-class": "hide-tray-drawer",
+        "transition-left-to-right": true,
+        "click-to-reveal": false,
+      },
+      "modules": ["custom/dropdown#arrow", "tray"],
+    },
 
-        "pulseaudio": {
-            "format": "{icon}  {volume}%",
-            "format-muted": "",
-            "format-icons": {
-                "headphone": "",
-                "hands-free": "󰋋",
-                "headset": "󰋋",
-                "phone": "",
-                "phone-muted": "",
-                "portable": "",
-                "car": "",
-                "default": ["", "", ""]
-            },
-            "on-click": "pavucontrol",
-            "on-click-right": "pamixer -t",
-            "ignored-sinks": [
-                "Easy Effects Sink"
-            ]
-        },
+    "custom/notification-silencing-indicator": {
+      "on-click": "makoctl mode -t do-not-disturb",
+      "exec": "~/.config/waybar/scripts/notification-silencing.sh",
+      "signal": 10,
+      "return-type": "json",
+    },
 
-        "tray": {
-            "spacing": 10
-        },
+    "custom/voxtype": {
+      "exec": "~/.config/waybar/scripts/voxtype-status.sh",
+      "return-type": "json",
+      "format": "{icon}",
+      "format-icons": {
+        "idle": "",
+        "recording": "󰍬",
+        "transcribing": "󰔟",
+      },
+      "tooltip": true,
+      "on-click-right": "~/.config/waybar/scripts/voxtype-config.sh",
+      "on-click": "~/.config/waybar/scripts/voxtype-model.sh",
+    },
 
-        "custom/screenrecording-indicator": {
-            "on-click": "wf-recorder",
-            "exec": "~/.config/waybar/scripts/screen-recording.sh",
-            "signal": 8,
-            "return-type": "json"
-        },
+    "custom/dropdown#arrow": {
+      "format": "",
+      "tooltip": true,
+      "tooltip-format": "Reveal tray",
+    },
 
-        "group/hide-tray": {
-            "orientation": "inherit",
-            "drawer": {
-                "transition-duration": "0.5",
-                "children-class": "hide-tray-drawer",
-                "transition-left-to-right": true,
-                "click-to-reveal": false
-            },
-            "modules": ["custom/dropdown#arrow", "tray"]
-        },
+    "custom/notification": {
+      "tooltip": true,
+      "tooltip-format": "Left Click: Launch Notifications\nMiddle Click: Clear All\nRight Click: Do Not Disturb",
+      "format": "{}",
+      "return-type": "json",
+      "exec-if": "which makoctl",
+      "exec": "~/.config/waybar/scripts/mako.sh",
+      "on-click": "~/.config/waybar/scripts/rofi_mako.sh",
+      "on-click-middle": "~/.config/waybar/scripts/mako.sh --clear && pkill -RTMIN+8 waybar",
+      "on-click-right": "makoctl mode -t do-not-disturb && pkill -RTMIN+8 waybar",
+      "escape": true,
+    },
 
-        "custom/notification-silencing-indicator": {
-            "on-click": "makoctl mode -t do-not-disturb",
-            "exec": "~/.config/waybar/scripts/notification-silencing.sh",
-            "signal": 10,
-            "return-type": "json"
-        },
+    "group/updates-drawer": {
+      "orientation": "inherit",
+      "drawer": {
+        "transition-duration": "0.3",
+        "children-class": "updates-drawer",
+        "click-to-reveal": false,
+      },
+      "modules": ["custom/updates-trigger", "custom/update"],
+    },
 
-        "custom/voxtype": {
-            "exec": "~/.config/waybar/scripts/voxtype-status.sh",
-            "return-type": "json",
-            "format": "{icon}",
-            "format-icons": {
-                "idle": "",
-                "recording": "󰍬",
-                "transcribing": "󰔟"
-            },
-            "tooltip": true,
-            "on-click-right": "~/.config/waybar/scripts/voxtype-config.sh",
-            "on-click": "~/.config/waybar/scripts/voxtype-model.sh"
-        },
-
-        "custom/dropdown#arrow": {
-            "format": "",
-            "tooltip": true,
-            "tooltip-format": "Reveal tray"
-        },
-
-        "custom/notification": {
-            "tooltip": true,
-            "tooltip-format": "Left Click: Launch Notifications\nMiddle Click: Clear All\nRight Click: Do Not Disturb",
-            "format": "{}",
-            "return-type": "json",
-            "exec-if": "which makoctl",
-            "exec": "~/.config/waybar/scripts/mako.sh",
-            "on-click": "~/.config/waybar/scripts/rofi_mako.sh",
-            "on-click-middle": "~/.config/waybar/scripts/mako.sh --clear && pkill -RTMIN+8 waybar",
-            "on-click-right": "makoctl mode -t do-not-disturb && pkill -RTMIN+8 waybar",
-            "escape": true
-        },
-
-        "group/updates-drawer": {
-            "orientation": "inherit",
-            "drawer": {
-                "transition-duration": "0.3",
-                "children-class": "updates-drawer",
-                "click-to-reveal": false
-            },
-            "modules": ["custom/updates-trigger", "custom/update"]
-        },
-
-        "custom/inhibit-suspend": {
-            "format": "{icon}",
-            "format-icons": {
-                "activated": "󰅶",
-                "deactivated": "󰾪"
-            },
-            "exec": "~/.config/waybar/scripts/inhibit-status.sh",
-            "return-type": "json",
-            "on-click": "~/.config/waybar/scripts/inhibit-toggle.sh",
-            "interval": 5
-        }
-    }
+    "custom/inhibit-suspend": {
+      "format": "{icon}",
+      "format-icons": {
+        "activated": "󰅶",
+        "deactivated": "󰾪",
+      },
+      "exec": "~/.config/waybar/scripts/inhibit-status.sh",
+      "return-type": "json",
+      "on-click": "~/.config/waybar/scripts/inhibit-toggle.sh",
+      "interval": 5,
+    },
+  },
 ]
