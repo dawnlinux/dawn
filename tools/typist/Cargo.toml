@@ -1,0 +1,20 @@
+[package]
+name = "typist"
+version = "0.1.0"
+edition = "2024"
+description = "A minimal typing test for Wayland"
+
+[dependencies]
+# Wayland client plumbing: xdg-shell, wl_shm buffers, xkb keyboard handling.
+smithay-client-toolkit = "0.21.1"
+# Software rasterizer for the panel, divider and pill. No GPU context anywhere.
+tiny-skia = { version = "0.12.0", default-features = false, features = ["std", "simd"] }
+# Glyph rasterization: lazy outlining, so unused glyphs cost nothing.
+ab_glyph = "0.2.32"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true

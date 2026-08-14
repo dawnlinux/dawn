@@ -111,3 +111,18 @@ hl.window_rule({
 	rounding  = 12,
 	animation = "popin",
 })
+
+-- Typing test. The app draws its own translucent panel and hairline, so the
+-- compositor supplies only the blur behind it: no border, and full opacity so
+-- the app's own alpha is the single thing deciding how see-through it is.
+hl.window_rule({
+	name        = "float-typist",
+	match       = { class = "^(typist)$" },
+	float       = true,
+	size        = { 1100, 620 },
+	center      = true,
+	rounding    = 16,
+	border_size = 0,
+	opacity     = 1.0,
+	animation   = "popin",
+})

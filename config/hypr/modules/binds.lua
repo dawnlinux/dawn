@@ -21,6 +21,11 @@ local mainMod     = "SUPER"
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal), { description = "Open Terminal" })
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager), { description = "Open File Manager" })
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("firefox"), { description = "Open Browser" })
+-- Absolute path on purpose: Hyprland inherits the login environment, which has
+-- no ~/.local/bin on PATH (fish adds it, and Hyprland never sources fish), so a
+-- bare "typist" here silently finds nothing.
+hl.bind(mainMod .. " + SHIFT + Y", hl.dsp.exec_cmd(os.getenv("HOME") .. "/.local/bin/typist"),
+	{ description = "Typing Test" })
 -- The launcher lives in the dawn-island shell, which registers a global
 -- shortcut named "quickshell:launcher" (appid + Config.launcherShortcut).
 -- Dispatching to it rather than exec'ing keeps the key working across shell
