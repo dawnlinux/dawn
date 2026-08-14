@@ -47,10 +47,13 @@ Item {
     Keys.onEnterPressed: Nav.activate()
     Keys.onSpacePressed: Nav.activate()
 
-    // Off and on, as two keys rather than one toggle. Handled here because Qt
-    // gives Backspace and the bare modifier no signal of their own; everything
-    // else falls through to the handlers above, which is why only these two
-    // are accepted.
+    // Handled here because Qt gives Backspace, the bare modifier and the letter
+    // keys no signal of their own; everything else falls through to the
+    // handlers above, which is why only these are accepted.
+    //
+    // hjkl sit alongside the arrows rather than replacing them — the panel has
+    // no text field, so the letters are free, and both sets stay live at once.
+    // Same axes vim uses: jk down/up the list, hl left/right along a level.
     Keys.onPressed: function (event) {
         switch (event.key) {
         case Qt.Key_Backspace:
@@ -59,6 +62,22 @@ Item {
             break;
         case Qt.Key_Control:
             Nav.setEnabled(true);
+            event.accepted = true;
+            break;
+        case Qt.Key_J:
+            Nav.move(1);
+            event.accepted = true;
+            break;
+        case Qt.Key_K:
+            Nav.move(-1);
+            event.accepted = true;
+            break;
+        case Qt.Key_H:
+            Nav.adjust(-1);
+            event.accepted = true;
+            break;
+        case Qt.Key_L:
+            Nav.adjust(1);
             event.accepted = true;
             break;
         }

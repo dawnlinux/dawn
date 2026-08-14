@@ -48,6 +48,8 @@ Item {
     Keys.onReturnPressed: Notifs.invokeSelected()
     Keys.onEnterPressed: Notifs.invokeSelected()
 
+    // jk walk the list alongside the arrows; there is no text field here, so
+    // the letters are free and both sets stay live at once.
     Keys.onPressed: function (event) {
         switch (event.key) {
         case Qt.Key_Backspace:
@@ -62,6 +64,14 @@ Item {
             break;
         case Qt.Key_D:
             Notifs.toggleDnd();
+            event.accepted = true;
+            break;
+        case Qt.Key_J:
+            Notifs.move(1);
+            event.accepted = true;
+            break;
+        case Qt.Key_K:
+            Notifs.move(-1);
             event.accepted = true;
             break;
         }

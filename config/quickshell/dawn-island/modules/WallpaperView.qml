@@ -47,6 +47,24 @@ Item {
     Keys.onTabPressed: Wallpaper.move(1)
     Keys.onBacktabPressed: Wallpaper.move(-1)
 
+    // hl alongside the arrows. The carousel's axis is horizontal, so jk move
+    // along it as well rather than doing nothing — there is no second axis for
+    // them to mean, and a dead key is worse than a synonym.
+    Keys.onPressed: function (event) {
+        switch (event.key) {
+        case Qt.Key_H:
+        case Qt.Key_K:
+            Wallpaper.move(-1);
+            event.accepted = true;
+            break;
+        case Qt.Key_L:
+        case Qt.Key_J:
+            Wallpaper.move(1);
+            event.accepted = true;
+            break;
+        }
+    }
+
     // ── Header ────────────────────────────────────────────────────────────
 
     Item {
