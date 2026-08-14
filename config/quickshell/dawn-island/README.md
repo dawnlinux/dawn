@@ -4,7 +4,7 @@ An Apple-style Dynamic Island for Hyprland, built on Quickshell.
 
 At rest it is a small black pill at the top of the screen showing the time.
 When something happens — the volume moves, a track changes, a notification
-arrives, you switch workspace — the pill *becomes* that thing: it springs to a
+arrives, you switch workspace — the pill _becomes_ that thing: it springs to a
 new shape, shows what it has to say, and springs back. Hovering it opens the
 full panel: now playing on the left, clock and week strip on the right, or your
 wifi / bluetooth / battery / volume when nothing is playing.
@@ -70,25 +70,25 @@ shortcuts instead and `binds.lua` routes keys to them. The binding lives in
 Hyprland, survives config reloads, and quietly does nothing when the shell isn't
 running.
 
-| Key             | Does                                                    |
-| --------------- | ------------------------------------------------------- |
-| `Super+Space`   | app launcher — type to search, `↑↓` select, `⏎` launch  |
+| Key             | Does                                                       |
+| --------------- | ---------------------------------------------------------- |
+| `Super+Space`   | app launcher — type to search, `↑↓` select, `⏎` launch     |
 | `Super+I`       | status panel — wifi, bluetooth, battery, volume, backlight |
-| `Super+Shift+W` | wallpaper carousel                                       |
-| `Super+N`       | notification centre                                      |
-| `Super+M`       | session menu — lock, sleep, log out, restart, shut down   |
-| `Super+.`       | expanded panel, the keyboard equivalent of hovering      |
+| `Super+Shift+W` | wallpaper carousel                                         |
+| `Super+N`       | notification centre                                        |
+| `Super+M`       | session menu — lock, sleep, log out, restart, shut down    |
+| `Super+.`       | expanded panel, the keyboard equivalent of hovering        |
 
 Inside the status panel:
 
-| Key         | Does                                                       |
-| ----------- | ---------------------------------------------------------- |
-| `↑` `↓`     | move the selection (`Tab` / `Shift+Tab` also work)         |
+| Key         | Does                                                                 |
+| ----------- | -------------------------------------------------------------------- |
+| `↑` `↓`     | move the selection (`Tab` / `Shift+Tab` also work)                   |
 | `⏎`         | open the row's real tool — `nmtui` for wifi, `bluetui` for bluetooth |
-| `Backspace` | switch the selected row **off** — radio off, audio muted   |
-| `Ctrl`      | switch it **on** again                                     |
-| `←` `→`     | slide the rows that hold a level — volume, brightness      |
-| `Esc`       | close                                                      |
+| `Backspace` | switch the selected row **off** — radio off, audio muted             |
+| `Ctrl`      | switch it **on** again                                               |
+| `←` `→`     | slide the rows that hold a level — volume, brightness                |
+| `Esc`       | close                                                                |
 
 Three verbs rather than one toggle, deliberately. The key you press most often
 should do the thing you most often want, and on a wifi row that is "show me the
@@ -123,7 +123,7 @@ clicking the one already centred is what applies it, so the pointer can never
 set a wallpaper you hadn't looked at.
 
 A grid was the obvious shape and the wrong one: a grid asks you to search it,
-twelve equal tiles with none of them the subject. A carousel *has* a subject —
+twelve equal tiles with none of them the subject. A carousel _has_ a subject —
 the one in the middle is the one you are choosing, and the neighbours shrink and
 fade along the path so depth does the work an outline would otherwise do alone.
 
@@ -159,14 +159,14 @@ gone for good — fine for a volume change, indefensible for a message that land
 while something was fullscreen. This is the other half: the same events, kept
 (`Notifs.recent`, capped at 12), reachable on purpose rather than by luck.
 
-| Key               | Does                                                  |
-| ----------------- | ----------------------------------------------------- |
-| `↑` `↓`           | move the selection                                    |
+| Key               | Does                                                   |
+| ----------------- | ------------------------------------------------------ |
+| `↑` `↓`           | move the selection                                     |
 | `⏎`               | run the notification's default action, then dismiss it |
-| `Backspace`       | dismiss the selected one                              |
-| `Shift+Backspace` | clear all                                             |
-| `d`               | do not disturb                                        |
-| `Esc`             | close                                                 |
+| `Backspace`       | dismiss the selected one                               |
+| `Shift+Backspace` | clear all                                              |
+| `d`               | do not disturb                                         |
+| `Esc`             | close                                                  |
 
 Same verbs as the status panel, deliberately — learning the island once should
 be enough to drive all of it. Rows show the app, how long ago it arrived, the
@@ -235,22 +235,22 @@ hl.bind("SUPER + PERIOD",    hl.dsp.global("quickshell:island"))
 
 Everything below was already present on this machine; nothing was installed.
 
-| Package          | Used for                                    | Required?                     |
-| ---------------- | ------------------------------------------- | ----------------------------- |
-| `quickshell`     | the shell itself (0.3.0)                    | yes                           |
-| `hyprland`       | workspace / monitor state (0.56.2)          | yes                           |
-| `pipewire`       | volume, mute, peak metering                 | yes, for volume               |
-| `brightnessctl`  | reading and setting the backlight           | yes, for brightness           |
-| `systemd`        | `udevadm` — backlight change events         | yes, for brightness           |
-| `wl-clipboard`   | `wl-paste --watch` — copy events            | yes, for clipboard            |
-| `cliphist`       | clipboard *history* for the picker          | optional                      |
-| `rofi`           | the clipboard picker UI                     | optional                      |
-| `networkmanager` | wifi / ethernet state                       | optional                      |
-| `bluez`          | bluetooth adapter and device state          | optional                      |
-| `awww`           | setting the wallpaper from the carousel     | optional                      |
-| `upower`         | battery                                     | optional                      |
-| Inter            | UI typeface                                 | falls back to sans-serif      |
-| JetBrainsMono NF | icon glyphs where no vector icon exists     | falls back to a missing glyph |
+| Package          | Used for                                | Required?                     |
+| ---------------- | --------------------------------------- | ----------------------------- |
+| `quickshell`     | the shell itself (0.3.0)                | yes                           |
+| `hyprland`       | workspace / monitor state (0.56.2)      | yes                           |
+| `pipewire`       | volume, mute, peak metering             | yes, for volume               |
+| `brightnessctl`  | reading and setting the backlight       | yes, for brightness           |
+| `systemd`        | `udevadm` — backlight change events     | yes, for brightness           |
+| `wl-clipboard`   | `wl-paste --watch` — copy events        | yes, for clipboard            |
+| `cliphist`       | clipboard _history_ for the picker      | optional                      |
+| `rofi`           | the clipboard picker UI                 | optional                      |
+| `networkmanager` | wifi / ethernet state                   | optional                      |
+| `bluez`          | bluetooth adapter and device state      | optional                      |
+| `awww`           | setting the wallpaper from the carousel | optional                      |
+| `upower`         | battery                                 | optional                      |
+| Inter            | UI typeface                             | falls back to sans-serif      |
+| JetBrainsMono NF | icon glyphs where no vector icon exists | falls back to a missing glyph |
 
 Every service degrades on its own: no battery, no battery row; no bluetooth
 adapter, no bluetooth row; no backlight, no brightness pill. Nothing else stops
@@ -277,7 +277,7 @@ whenever the current owner disappears, so you do not need to restart the shell.
 Notification banners were verified working this way; swaync was then restored.
 
 Keep in mind the island shows a notification for a few seconds and keeps a
-short in-memory history, but it is not a notification *centre*: there is no
+short in-memory history, but it is not a notification _centre_: there is no
 persistent panel listing everything you missed. If you want that, keep swaync.
 
 ---
@@ -319,7 +319,7 @@ thing the island can show is one file in `modules/`, one entry in
 
 ### The state machine
 
-Services *request* a state for a duration rather than assigning one, because
+Services _request_ a state for a duration rather than assigning one, because
 these events genuinely overlap — music starts, you nudge the volume, a
 notification lands, you switch workspace, all inside two seconds. Requests are
 resolved by the priority table in `Config.qml`; when one expires the island
@@ -369,26 +369,26 @@ layerrule = ignorezero, dawn-island
 
 ## Interaction
 
-| Input                    | Result                                     |
-| ------------------------ | ------------------------------------------ |
-| Hover                    | opens the full panel                       |
-| Left click               | pins the panel open; click again to unpin  |
-| Right click              | unpins, or runs `Config.rightClickCommand` |
-| Middle click             | toggle mute                                |
-| Scroll                   | volume                                     |
-| Click artwork transport  | previous / play-pause / next               |
-| Drag the seek bar        | scrub the track                            |
-| Drag the volume bar      | set volume                                 |
-| Click a workspace dot    | switch to it                               |
-| Click a clipboard entry  | opens the cliphist picker                  |
-| Click a notification     | invokes its default action and dismisses   |
+| Input                   | Result                                     |
+| ----------------------- | ------------------------------------------ |
+| Hover                   | opens the full panel                       |
+| Left click              | pins the panel open; click again to unpin  |
+| Right click             | unpins, or runs `Config.rightClickCommand` |
+| Middle click            | toggle mute                                |
+| Scroll                  | volume                                     |
+| Click artwork transport | previous / play-pause / next               |
+| Drag the seek bar       | scrub the track                            |
+| Drag the volume bar     | set volume                                 |
+| Click a workspace dot   | switch to it                               |
+| Click a clipboard entry | opens the cliphist picker                  |
+| Click a notification    | invokes its default action and dismisses   |
 
 ---
 
 ## Things worth knowing
 
 **Hyprland 0.56 changed the dispatcher API.** It replaced the string grammar
-with Lua, so the old `dispatch workspace 3` is now a *syntax error* rather than
+with Lua, so the old `dispatch workspace 3` is now a _syntax error_ rather than
 a no-op — and from QML that fails completely silently. Workspace switching uses
 the Lua form (`hl.dsp.focus({workspace="3"})`). On older Hyprland, set
 `Config.hyprlandLuaDispatch = false`.
@@ -405,7 +405,7 @@ data-control protocol. This is the same reason `wl-paste` exists as a daemon.
 a screen that might be shared. Verified with an API key.
 
 **Qt's JS engine is not a browser's.** `String.prototype.trimEnd` does not
-exist, and calling it throws *inside a binding*, which surfaces as text that
+exist, and calling it throws _inside a binding_, which surfaces as text that
 silently never renders rather than as an error. Both truncation helpers use a
 regex instead.
 
