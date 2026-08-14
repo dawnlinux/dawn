@@ -27,6 +27,14 @@ hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("firefox"), { description = "Open Bro
 -- restarts, and does nothing at all when the shell isn't running.
 hl.bind(mainMod .. " + SPACE", hl.dsp.global("quickshell:launcher"),
 	{ description = "App Launcher (dawn-island)" })
+
+-- Keyboard-driven island. SUPER+I opens the status panel (wifi, bluetooth,
+-- battery, volume, brightness) where arrows navigate, Enter toggles and Escape
+-- closes; SUPER+PERIOD is the keyboard equivalent of hovering the notch.
+hl.bind(mainMod .. " + I", hl.dsp.global("quickshell:status"),
+	{ description = "Status Panel (dawn-island)" })
+hl.bind(mainMod .. " + PERIOD", hl.dsp.global("quickshell:island"),
+	{ description = "Toggle Island Panel (dawn-island)" })
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/quickshell/dawn-island/launch.sh"),
 	{ description = "Restart Shell (dawn-island)" })
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("swaync-client --toggle-panel"), { description = "Toggle Notification Panel" })
