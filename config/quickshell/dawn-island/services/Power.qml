@@ -3,7 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.UPower
-import "root:/"
+import qs
 
 /*
  * Battery and AC state via UPower.

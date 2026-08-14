@@ -1,8 +1,8 @@
 import QtQuick
-import "root:/"
-import "root:/theme"
-import "root:/components"
-import "root:/services"
+import qs
+import qs.theme
+import qs.components
+import qs.services
 
 /*
  * Time over a week strip — the right half of the reference layout.

@@ -1,5 +1,5 @@
 import QtQuick
-import "root:/theme"
+import qs.theme
 
 /// Text preconfigured for the island. Keeps font decisions out of the modules.
 /// Set `eyebrow: true` for the small uppercase rows (artist, "COPIED", app

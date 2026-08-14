@@ -1,6 +1,6 @@
 import QtQuick
-import "root:/"
-import "root:/theme"
+import qs
+import qs.theme
 
 /*
  * Single-line text that scrolls only when it does not fit.

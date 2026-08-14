@@ -1,8 +1,8 @@
 import QtQuick
-import "root:/"
-import "root:/theme"
-import "root:/components"
-import "root:/services"
+import qs
+import qs.theme
+import qs.components
+import qs.services
 
 /*
  * What the expanded panel shows when nothing is playing.
@@ -17,10 +17,11 @@ import "root:/services"
 Item {
     id: root
 
-    property real contentHeight: Config.expandedHeight - Theme.padV * 2
-
+    // Reports what the rows actually need rather than a fixed panel height:
+    // how many rows there are depends on the machine, and a desktop with no
+    // battery should not leave a gap where one would have been.
     implicitWidth: Math.max(150, rows.implicitWidth)
-    implicitHeight: contentHeight
+    implicitHeight: rows.implicitHeight
 
     component StatusRow: Row {
         property alias icon: rowIcon.name
@@ -78,6 +79,16 @@ Item {
             text: Net.label
             detail: Net.kind === "wifi" && Net.connected
                     ? Math.round(Net.strength * 100) + "%" : ""
+        }
+
+        StatusRow {
+            visible: Config.showBluetooth && Bt.available
+            icon: "bluetooth"
+            muted: !Bt.powered
+            tint: Bt.connected ? Theme.textSecondary
+                : (Bt.powered ? Theme.textTertiary : Theme.textQuaternary)
+            text: Bt.label
+            detail: Bt.detail
         }
 
         StatusRow {

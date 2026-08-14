@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Shapes
-import "root:/theme"
+import qs.theme
 
 /*
  * Vector icon set.
@@ -36,7 +36,8 @@ Item {
 
     readonly property var _vectorNames: [
         "play", "pause", "next", "prev", "speaker", "sun",
-        "battery", "wifi", "ethernet", "bell", "copy", "dot", "check", "close"
+        "battery", "wifi", "ethernet", "bluetooth", "bell", "copy", "dot",
+        "check", "close", "search", "arch"
     ]
     readonly property bool isVector: _vectorNames.indexOf(name) !== -1
 
@@ -361,6 +362,51 @@ Item {
             }
         }
 
+        // — bluetooth —
+        //
+        // The rune drawn as one continuous stroke rather than two triangles:
+        // the crossing in the middle is the whole character of the mark, and
+        // filled halves lose it at 15px.
+        Item {
+            visible: root.name === "bluetooth"
+            anchors.fill: parent
+
+            Shape {
+                anchors.fill: parent
+                preferredRendererType: Shape.CurveRenderer
+                opacity: root.muted ? 0.35 : 1.0
+                Behavior on opacity { NumberAnimation { duration: Anim.content } }
+                ShapePath {
+                    fillColor: "transparent"
+                    strokeColor: root.color
+                    strokeWidth: 1.9
+                    capStyle: ShapePath.RoundCap
+                    joinStyle: ShapePath.RoundJoin
+                    startX: 7.4; startY: 8.2
+                    PathLine { x: 16.6; y: 15.8 }
+                    PathLine { x: 12; y: 20.4 }
+                    PathLine { x: 12; y: 3.6 }
+                    PathLine { x: 16.6; y: 8.2 }
+                    PathLine { x: 7.4; y: 15.8 }
+                }
+            }
+
+            // Off reads as struck through, matching the wifi icon's grammar.
+            Shape {
+                anchors.fill: parent
+                visible: root.muted
+                preferredRendererType: Shape.CurveRenderer
+                ShapePath {
+                    fillColor: "transparent"
+                    strokeColor: root.color
+                    strokeWidth: 1.8
+                    capStyle: ShapePath.RoundCap
+                    startX: 4.5; startY: 4.5
+                    PathLine { x: 19.5; y: 19.5 }
+                }
+            }
+        }
+
         // — bell —
         Shape {
             visible: root.name === "bell"
@@ -460,6 +506,70 @@ Item {
                 capStyle: ShapePath.RoundCap
                 startX: 17.5; startY: 6.5
                 PathLine { x: 6.5; y: 17.5 }
+            }
+        }
+
+        // — search —
+        Shape {
+            visible: root.name === "search"
+            anchors.fill: parent
+            preferredRendererType: Shape.CurveRenderer
+            ShapePath {
+                fillColor: "transparent"
+                strokeColor: root.color
+                strokeWidth: 2
+                capStyle: ShapePath.RoundCap
+                startX: 16.2; startY: 10.6
+                PathAngleArc {
+                    centerX: 10.6; centerY: 10.6
+                    radiusX: 5.6; radiusY: 5.6
+                    startAngle: 0; sweepAngle: 360
+                }
+            }
+            ShapePath {
+                fillColor: "transparent"
+                strokeColor: root.color
+                strokeWidth: 2
+                capStyle: ShapePath.RoundCap
+                startX: 14.9; startY: 14.9
+                PathLine { x: 19.5; y: 19.5 }
+            }
+        }
+    }
+
+    // ── Arch logo ─────────────────────────────────────────────────────────
+    //
+    // Authored on its own 256 grid rather than the 24 one above, because the
+    // path is taken verbatim from /usr/share/pixmaps/archlinux-logo.svg —
+    // redrawing it by hand on a smaller grid would only be a worse copy of a
+    // logo everyone already knows the shape of.
+    //
+    // Tinted with `color` instead of the official blue: the island is
+    // monochrome, and one saturated mark in it reads as a sticker.
+    Shape {
+        visible: root.name === "arch"
+        anchors.centerIn: parent
+        width: 256
+        height: 256
+        scale: root.size / 236        // the glyph's own bounds, not the viewBox
+        preferredRendererType: Shape.CurveRenderer
+
+        ShapePath {
+            fillColor: root.color
+            // Negative width disables stroking outright — a 0-width stroke is
+            // still a stroke as far as the renderer is concerned.
+            strokeWidth: -1
+            fillRule: ShapePath.OddEvenFill
+
+            PathSvg {
+                path: "m127.98 12.07c-10.316 25.309-16.543 41.855-28.031 66.41 "
+                    + "7.043 7.4609 15.691 16.156 29.734 25.977-15.098-6.207-25.395-12.445-33.094-18.918"
+                    + "-14.703 30.68-37.742 74.391-84.492 158.39 36.746-21.219 65.23-34.293 91.773-39.289"
+                    + "-1.1406-4.8945-1.7852-10.195-1.7422-15.734l0.042969-1.1719c0.58203-23.551 "
+                    + "12.828-41.645 27.336-40.418 14.508 1.2266 25.781 21.316 25.199 44.867-0.10938 "
+                    + "4.4219-0.60938 8.6914-1.4805 12.641 26.258 5.1328 54.438 18.18 90.684 39.105"
+                    + "-7.1484-13.156-13.527-25.016-19.621-36.316-9.5938-7.4336-19.605-17.117-40.023-27.594 "
+                    + "14.035 3.6406 24.082 7.8516 31.914 12.555-61.941-115.32-66.957-130.66-88.199-180.5z"
             }
         }
     }

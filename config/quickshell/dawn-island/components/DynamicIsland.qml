@@ -2,10 +2,10 @@ import QtQuick
 import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
-import "root:/"
-import "root:/theme"
-import "root:/services"
-import "root:/modules"
+import qs
+import qs.theme
+import qs.services
+import qs.modules
 
 /*
  * The island.
@@ -29,11 +29,26 @@ import "root:/modules"
 Item {
     id: root
 
-    /// The view actually on screen. Hovering or pinning outranks the state
-    /// machine — while you are looking at the island directly, you want the
-    /// panel, not whatever briefly happened.
+    /// The view actually on screen.
+    ///
+    /// The launcher and the status panel win outright — they are the states the
+    /// user opened on purpose, and having a hover or a notification yank one
+    /// away mid-search would be indefensible. Below those, hovering or pinning
+    /// outranks the state machine: while you are looking at the island directly
+    /// you want the panel, not whatever briefly happened.
     readonly property string viewState:
-        (pinned || hoverExpanded) ? "expanded" : IslandState.current
+          IslandState.current === "launcher"          ? "launcher"
+        : IslandState.current === "wallpaper"         ? "wallpaper"
+        : IslandState.current === "status"            ? "status"
+        : (pinned || hoverExpanded || Nav.panelPinned) ? "expanded"
+        : IslandState.current
+
+    /// The shell needs to know when to take keyboard focus. Only the panels
+    /// that read keystrokes ask for it — an island that held focus while merely
+    /// expanded would take every keystroke on the machine.
+    readonly property bool wantsKeyboard:
+        viewState === "launcher" || viewState === "status"
+        || viewState === "wallpaper"
 
     property bool hoverExpanded: false
     property bool pinned: false
@@ -102,6 +117,9 @@ Item {
 
     function componentFor(state) {
         switch (state) {
+        case "launcher":     return launcherView;
+        case "wallpaper":    return wallpaperView;
+        case "status":       return statusView;
         case "expanded":     return expandedView;
         case "notification": return notificationView;
         case "volume":       return volumeView;
@@ -110,17 +128,26 @@ Item {
         case "workspace":    return workspaceView;
         case "battery":      return batteryView;
         case "network":      return networkView;
+        case "bluetooth":    return bluetoothView;
         case "media":        return mediaView;
         default:             return idleView;
         }
     }
 
-    Component { id: idleView; IdleView {} }
+    Component {
+        id: idleView
+        IdleView { onLogoClicked: Launcher.toggle() }
+    }
+
+    Component { id: launcherView; LauncherView {} }
+    Component { id: statusView; StatusView {} }
+    Component { id: wallpaperView; WallpaperView {} }
     Component { id: volumeView; VolumeView {} }
     Component { id: brightnessView; BrightnessView {} }
     Component { id: workspaceView; WorkspaceView {} }
     Component { id: batteryView; BatteryView {} }
     Component { id: networkView; NetworkView {} }
+    Component { id: bluetoothView; BluetoothView {} }
 
     Component {
         id: mediaView
@@ -157,9 +184,14 @@ Item {
     // clicks) or below them (and never see a hover). Handlers on the island
     // itself see everything without competing with the buttons inside it.
 
+    // While the launcher is open the island belongs to it: hovering must not
+    // yank the panel out from under a search, clicking a result must not also
+    // toggle the pin, and scrolling should move the result list rather than
+    // the volume.
+
     HoverHandler {
         id: hoverHandler
-        enabled: Config.expandOnHover
+        enabled: Config.expandOnHover && !root.wantsKeyboard
         onHoveredChanged: {
             if (hovered) {
                 closeTimer.stop();
@@ -185,8 +217,16 @@ Item {
 
     TapHandler {
         acceptedButtons: Qt.LeftButton
-        enabled: Config.expandOnClick
+        enabled: Config.expandOnClick && !root.wantsKeyboard
         onTapped: {
+            // The keyboard pin and the click pin are one affordance reached
+            // two ways, so clicking a keyboard-opened panel closes it rather
+            // than fighting it.
+            if (Nav.panelPinned) {
+                Nav.panelPinned = false;
+                root.pinned = false;
+                return;
+            }
             root.pinned = !root.pinned;
             if (root.pinned)
                 root.hoverExpanded = true;
@@ -196,20 +236,29 @@ Item {
     TapHandler {
         acceptedButtons: Qt.RightButton
         onTapped: {
-            if (Config.rightClickCommand !== "")
+            if (root.viewState === "launcher")
+                Launcher.hide();
+            else if (root.viewState === "wallpaper")
+                Wallpaper.hide();
+            else if (root.viewState === "status")
+                Nav.hide();
+            else if (Config.rightClickCommand !== "")
                 Quickshell.execDetached(["sh", "-c", Config.rightClickCommand]);
-            else
+            else {
                 root.pinned = false;
+                Nav.panelPinned = false;
+            }
         }
     }
 
     TapHandler {
         acceptedButtons: Qt.MiddleButton
+        enabled: !root.wantsKeyboard
         onTapped: Audio.toggleMute()
     }
 
     WheelHandler {
-        enabled: Config.scrollToChangeVolume
+        enabled: Config.scrollToChangeVolume && !root.wantsKeyboard
         acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
         onWheel: function (ev) {
             // Touchpads deliver many small deltas and a mouse wheel delivers

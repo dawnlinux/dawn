@@ -3,7 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
-import "root:/"
+import qs
 
 /*
  * Notification daemon.

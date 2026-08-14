@@ -1,6 +1,6 @@
 import QtQuick
-import "root:/"
-import "root:/theme"
+import qs
+import qs.theme
 
 /*
  * Cross-fades between island contents.

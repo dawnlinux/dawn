@@ -1,7 +1,7 @@
 import QtQuick
-import "root:/"
-import "root:/theme"
-import "root:/services"
+import qs
+import qs.theme
+import qs.services
 
 /// Screen backlight.
 LevelPill {

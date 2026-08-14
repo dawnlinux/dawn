@@ -1,8 +1,8 @@
 import QtQuick
-import "root:/"
-import "root:/theme"
-import "root:/components"
-import "root:/services"
+import qs
+import qs.theme
+import qs.components
+import qs.services
 
 /// Transient "now playing" — what the island becomes when a track changes.
 /// Same pane as the expanded panel, minus the clock, with the text given the

@@ -4,9 +4,9 @@ import qs.theme
 import qs.components
 import qs.services
 
-/// Connectivity change — connected, disconnected, or moved between wifi and
-/// a cable. Only shown on a *transition*; the steady state lives in the
-/// expanded panel where it belongs.
+/// A device connected or dropped, or the radio was switched on or off. Only
+/// shown on a *transition* — the steady state lives in the status panel and the
+/// hover panel, where you go looking for it rather than being told.
 Item {
     id: root
 
@@ -21,11 +21,10 @@ Item {
 
         Icon {
             anchors.verticalCenter: parent.verticalCenter
-            name: Net.kind === "ethernet" ? "ethernet" : "wifi"
+            name: "bluetooth"
             size: 19
-            level: Net.strength
-            muted: !Net.connected
-            color: Net.connected ? Theme.text : Theme.textTertiary
+            muted: !Bt.powered
+            color: Bt.connected ? Theme.text : Theme.textTertiary
         }
 
         Column {
@@ -34,7 +33,7 @@ Item {
 
             Label {
                 width: Math.min(implicitWidth, 240)
-                text: Net.label
+                text: Bt.label
                 color: Theme.text
                 font.pixelSize: Typography.title
                 font.weight: Typography.semibold
@@ -42,7 +41,15 @@ Item {
 
             Label {
                 visible: text !== ""
-                text: Net.connected ? Net.address : "No connection"
+                text: {
+                    if (!Bt.powered)
+                        return "Radio off";
+                    if (!Bt.connected)
+                        return "No devices";
+                    return Bt.batteryAvailable
+                         ? "Connected · " + Bt.batteryPercent + "%"
+                         : "Connected";
+                }
                 color: Theme.textTertiary
                 font.pixelSize: Typography.caption
                 font.features: Typography.tabular

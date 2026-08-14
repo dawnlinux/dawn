@@ -1,6 +1,6 @@
 import QtQuick
-import "root:/"
-import "root:/theme"
+import qs
+import qs.theme
 
 /// Colour transition. Separate from FadeBehavior because colours need a
 /// ColorAnimation — a NumberAnimation silently does nothing useful on them.

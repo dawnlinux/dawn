@@ -1,0 +1,3 @@
+# Quickshell regenerates this per-run, pointing into /run/user/$UID.
+# Committing it makes the path wrong on every other machine and every reboot.
+.qmlls.ini

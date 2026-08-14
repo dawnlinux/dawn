@@ -7,7 +7,9 @@ When something happens — the volume moves, a track changes, a notification
 arrives, you switch workspace — the pill *becomes* that thing: it springs to a
 new shape, shows what it has to say, and springs back. Hovering it opens the
 full panel: now playing on the left, clock and week strip on the right, or your
-network / battery / volume when nothing is playing.
+wifi / bluetooth / battery / volume when nothing is playing.
+
+It is also drivable entirely from the keyboard — see [Keyboard](#keyboard).
 
 It is not a status bar with a popup underneath. There is one surface, and it
 changes size.
@@ -25,15 +27,145 @@ updates the running shell immediately — no restart needed.
 
 ### Autostart
 
-Already wired into `~/.config/hypr/modules/autostart.lua`:
+This is the default bar now. Wired into `~/.config/hypr/modules/autostart.lua`:
 
 ```lua
 hl.exec_cmd("qs -p ~/.config/quickshell/dawn-island/shell.qml")
 ```
 
-waybar's autostart line is commented out in the same file, because the island
-reserves an exclusive zone at the top edge and running both stacks two bars.
-Uncomment it to go back.
+### Super+R restarts it
+
+`~/.config/hypr/modules/binds.lua` now points Super+R at
+`~/.config/quickshell/dawn-island/launch.sh` instead of waybar's launcher. The
+script reloads `hyprland.conf` and restarts the shell, matching what the old
+bind did.
+
+You rarely need it — Quickshell hot-reloads whenever a file in this directory
+changes, so editing `Config.qml` updates the running island immediately.
+
+### Going back to waybar
+
+Nothing about waybar was deleted; `~/.config/waybar/` and its `launch.sh` are
+untouched, and `waybar.service` is still installed (disabled, as it already
+was). To restore it:
+
+1. Uncomment `hl.exec_cmd("waybar")` in `~/.config/hypr/modules/autostart.lua`
+2. Comment out the `qs -p ...` line above it, **or** set `exclusiveZone: 0` in
+   `Config.qml` so the island stops reserving the top edge and the two can
+   coexist
+3. Optionally point Super+R back at `~/.config/waybar/launch.sh`
+
+Running both without step 2 stacks two bars on the top edge.
+
+---
+
+## Keyboard
+
+The island is a pointer surface by default — hover to expand, click to pin,
+scroll to change the volume. That is fine until your hands are on the keyboard,
+which on a tiling desktop is nearly always, so there is a second way in.
+
+Quickshell 0.3.0 has no `IpcHandler`, so the shell registers Hyprland global
+shortcuts instead and `binds.lua` routes keys to them. The binding lives in
+Hyprland, survives config reloads, and quietly does nothing when the shell isn't
+running.
+
+| Key             | Does                                                    |
+| --------------- | ------------------------------------------------------- |
+| `Super+Space`   | app launcher — type to search, `↑↓` select, `⏎` launch  |
+| `Super+I`       | status panel — wifi, bluetooth, battery, volume, backlight |
+| `Super+Shift+W` | wallpaper carousel                                       |
+| `Super+.`       | expanded panel, the keyboard equivalent of hovering      |
+
+Inside the status panel:
+
+| Key         | Does                                                       |
+| ----------- | ---------------------------------------------------------- |
+| `↑` `↓`     | move the selection (`Tab` / `Shift+Tab` also work)         |
+| `⏎`         | open the row's real tool — `nmtui` for wifi, `bluetui` for bluetooth |
+| `Backspace` | switch the selected row **off** — radio off, audio muted   |
+| `Ctrl`      | switch it **on** again                                     |
+| `←` `→`     | slide the rows that hold a level — volume, brightness      |
+| `Esc`       | close                                                      |
+
+Three verbs rather than one toggle, deliberately. The key you press most often
+should do the thing you most often want, and on a wifi row that is "show me the
+networks", not "cut my connection" — so `⏎` hands off to the tool that can
+actually pick a network or pair a device, and the radio switch gets its own two
+keys. Unlike a toggle, both are idempotent: mashing `Backspace` leaves the radio
+off rather than flapping it, and neither can be hit by muscle memory aimed at
+the other.
+
+The commands are `Config.wifiCommand` and `Config.bluetoothCommand`:
+
+```qml
+property string wifiCommand: "kitty --class floating-nmtui -e nmtui"
+property string bluetoothCommand: "kitty --class floating-bluetui -e bluetui"
+```
+
+Both float via their `--class`; the matching rules are already in
+`~/.config/hypr/modules/windowrules.lua`. The panel closes as it launches — the
+terminal is about to take the focus anyway.
+
+The rows are built from what the machine actually has: no battery, no battery
+row; no bluetooth adapter, no bluetooth row. A row that cannot do anything —
+battery is a readout — ignores all three verbs rather than closing the panel
+under you.
+
+### Wallpaper carousel
+
+`Super+Shift+W` unfolds the notch into a coverflow of everything in
+`~/Pictures/Wallpapers`. `←` `→` browse, `⏎` sets the centred one, `Esc` closes;
+the scroll wheel moves it a tile per notch, and clicking a tile selects it —
+clicking the one already centred is what applies it, so the pointer can never
+set a wallpaper you hadn't looked at.
+
+A grid was the obvious shape and the wrong one: a grid asks you to search it,
+twelve equal tiles with none of them the subject. A carousel *has* a subject —
+the one in the middle is the one you are choosing, and the neighbours shrink and
+fade along the path so depth does the work an outline would otherwise do alone.
+
+It opens on whatever is already on the desktop rather than at the top of the
+folder, and the applied wallpaper keeps a green check while you browse past it,
+because the selected tile and the applied tile are different things.
+
+Applying shells out to `Config.wallpaperCommand`, where `{}` is the shell-quoted
+path:
+
+```qml
+property string wallpaperDir: home + "/Pictures/Wallpapers"
+property string wallpaperCommand:
+    "awww img {} --transition-type random --transition-duration 1.2 --transition-fps 60"
+```
+
+`random` is deliberate — awww picks a different wipe, grow or wave each time, so
+changing wallpaper never looks routine. Swap in `fade` for something calmer, or
+point the command at `swww` / `hyprpaper` if you change daemons. The folder is
+read live, so dropping a new image in makes it appear without restarting
+anything, and only the directory itself is scanned — no recursion, because a
+wallpaper folder with subfolders is a photo library and this is not a file
+manager.
+
+Thumbnails are decoded at twice the tile size and no larger; a folder of 4K
+photographs is the normal case and loading them at native resolution to draw
+them 176px wide is how a wallpaper picker ends up eating a gigabyte.
+
+### One panel at a time
+
+The launcher, the status panel and the wallpaper carousel all take exclusive
+keyboard focus, so only one is ever up; opening any of them closes the others.
+Clicking anywhere else closes whichever is open.
+
+To rebind, change the keys in `~/.config/hypr/modules/binds.lua`; the shortcut
+names themselves live in `Config.qml` as `launcherShortcut`, `statusShortcut`
+and `islandShortcut`:
+
+```lua
+hl.bind("SUPER + SPACE",     hl.dsp.global("quickshell:launcher"))
+hl.bind("SUPER + I",         hl.dsp.global("quickshell:status"))
+hl.bind("SUPER + SHIFT + W", hl.dsp.global("quickshell:wallpaper"))
+hl.bind("SUPER + PERIOD",    hl.dsp.global("quickshell:island"))
+```
 
 ---
 
@@ -52,12 +184,15 @@ Everything below was already present on this machine; nothing was installed.
 | `cliphist`       | clipboard *history* for the picker          | optional                      |
 | `rofi`           | the clipboard picker UI                     | optional                      |
 | `networkmanager` | wifi / ethernet state                       | optional                      |
+| `bluez`          | bluetooth adapter and device state          | optional                      |
+| `awww`           | setting the wallpaper from the carousel     | optional                      |
 | `upower`         | battery                                     | optional                      |
 | Inter            | UI typeface                                 | falls back to sans-serif      |
 | JetBrainsMono NF | icon glyphs where no vector icon exists     | falls back to a missing glyph |
 
-Every service degrades on its own: no battery, no battery row; no backlight, no
-brightness pill. Nothing else stops working.
+Every service degrades on its own: no battery, no battery row; no bluetooth
+adapter, no bluetooth row; no backlight, no brightness pill. Nothing else stops
+working.
 
 ---
 

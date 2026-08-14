@@ -1,7 +1,7 @@
 import QtQuick
-import "root:/"
-import "root:/theme"
-import "root:/components"
+import qs
+import qs.theme
+import qs.components
 
 /*
  * The volume / brightness pill: icon, track, percentage.

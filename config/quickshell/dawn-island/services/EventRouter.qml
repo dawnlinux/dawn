@@ -1,8 +1,8 @@
 import QtQuick
 import Quickshell
-import "root:/"
-import "root:/theme"
-import "root:/services"
+import qs
+import qs.theme
+import qs.services
 
 /*
  * The one place where "something happened" becomes "the island should show
@@ -109,6 +109,48 @@ Item {
         function onConnectivityChanged(connected, kind) {
             IslandState.request("network", Config.networkDuration);
         }
+    }
+
+    // ── Bluetooth ─────────────────────────────────────────────────────────
+
+    Connections {
+        target: Bt
+        enabled: Config.enableBluetooth
+        function onChanged(active, name) {
+            IslandState.request("bluetooth", Config.bluetoothDuration);
+        }
+    }
+
+    // ── Keyboard panels ───────────────────────────────────────────────────
+    //
+    // The launcher, the status panel and the wallpaper carousel all take
+    // exclusive keyboard focus, so only one may be up at a time. The priority
+    // table would already hide the losers, but they would stay *open*
+    // underneath and reappear when the winner closed — pressing the launcher
+    // key and later escaping out of it should leave you at the desktop, not in
+    // a panel you had forgotten about.
+
+    readonly property var keyboardPanels: [Launcher, Nav, Wallpaper]
+
+    function _closeOthers(winner) {
+        for (const panel of keyboardPanels)
+            if (panel !== winner && panel.open)
+                panel.hide();
+    }
+
+    Connections {
+        target: Launcher
+        function onOpenChanged() { if (Launcher.open) root._closeOthers(Launcher); }
+    }
+
+    Connections {
+        target: Nav
+        function onOpenChanged() { if (Nav.open) root._closeOthers(Nav); }
+    }
+
+    Connections {
+        target: Wallpaper
+        function onOpenChanged() { if (Wallpaper.open) root._closeOthers(Wallpaper); }
     }
 
     // ── Expensive things, switched on only while visible ───────────────────

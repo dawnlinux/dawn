@@ -3,7 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.Pipewire
-import "root:/"
+import qs
 
 /*
  * Default sink volume, mute and peak level, straight from PipeWire.
@@ -48,6 +48,12 @@ Singleton {
 
     function step(delta) {
         setVolume(volume + delta);
+    }
+
+    function setMuted(m) {
+        if (!ready)
+            return;
+        sink.audio.muted = m;
     }
 
     function toggleMute() {

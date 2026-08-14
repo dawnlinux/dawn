@@ -1,7 +1,7 @@
 import QtQuick
 import Quickshell.Widgets
-import "root:/"
-import "root:/theme"
+import qs
+import qs.theme
 
 /*
  * Album art / notification image with real rounded-corner clipping.

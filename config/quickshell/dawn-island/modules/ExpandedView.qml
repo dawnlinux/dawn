@@ -1,8 +1,8 @@
 import QtQuick
-import "root:/"
-import "root:/theme"
-import "root:/components"
-import "root:/services"
+import qs
+import qs.theme
+import qs.components
+import qs.services
 
 /*
  * The hover / click panel: the reference's two-pane layout.
@@ -29,7 +29,14 @@ Item {
         Config.expandedWidth - Theme.padH * 2 - clock.implicitWidth - Theme.spacingXl
 
     implicitWidth: Config.expandedWidth
-    implicitHeight: Config.expandedHeight
+
+    // Grows past the configured height when the status rows need it — a laptop
+    // with wifi, bluetooth, battery and audio has four rows to show, and
+    // clipping one of them off the bottom is worse than a taller panel.
+    implicitHeight: hasMedia
+                    ? Config.expandedHeight
+                    : Math.max(Config.expandedHeight,
+                               status.implicitHeight + Theme.padV * 2)
 
     // ── Left pane ─────────────────────────────────────────────────────────
 
@@ -48,10 +55,11 @@ Item {
     }
 
     StatusPane {
+        id: status
         anchors.left: parent.left
         anchors.leftMargin: Theme.padH + 2
         anchors.verticalCenter: parent.verticalCenter
-        height: root.height - Theme.padV * 2
+        height: implicitHeight
         visible: !root.hasMedia
         opacity: visible ? 1 : 0
         FadeBehavior on opacity {}

@@ -2,7 +2,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
-import "root:/"
+import qs
 
 /*
  * Motion vocabulary.
@@ -19,7 +19,7 @@ Singleton {
     readonly property int collapse: Config.animationsEnabled ? Config.collapseDuration : 0
     readonly property int content: Config.animationsEnabled ? Config.contentDuration : 0
     readonly property int fade: Config.animationsEnabled ? Config.fadeDuration : 0
-    readonly property int quick: Config.animationsEnabled ? 120 : 0
+    readonly property int quick: Config.animationsEnabled ? Config.quickDuration : 0
 
     // ── Easing ────────────────────────────────────────────────────────────
     /// Used for the shape morph only when Config.useRealSpring is false.

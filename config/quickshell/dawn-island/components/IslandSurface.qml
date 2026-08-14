@@ -1,6 +1,6 @@
 import QtQuick
-import "root:/"
-import "root:/theme"
+import qs
+import qs.theme
 
 /*
  * The black body of the notch.

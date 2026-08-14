@@ -35,6 +35,10 @@ hl.bind(mainMod .. " + I", hl.dsp.global("quickshell:status"),
 	{ description = "Status Panel (dawn-island)" })
 hl.bind(mainMod .. " + PERIOD", hl.dsp.global("quickshell:island"),
 	{ description = "Toggle Island Panel (dawn-island)" })
+-- SUPER+SHIFT+W: wallpaper carousel. ←→ browses ~/Pictures/Wallpapers,
+-- Enter applies it through awww with a random transition.
+hl.bind(mainMod .. " + SHIFT + W", hl.dsp.global("quickshell:wallpaper"),
+	{ description = "Wallpaper Carousel (dawn-island)" })
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/quickshell/dawn-island/launch.sh"),
 	{ description = "Restart Shell (dawn-island)" })
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("swaync-client --toggle-panel"), { description = "Toggle Notification Panel" })

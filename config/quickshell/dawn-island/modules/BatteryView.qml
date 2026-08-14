@@ -1,8 +1,8 @@
 import QtQuick
-import "root:/"
-import "root:/theme"
-import "root:/components"
-import "root:/services"
+import qs
+import qs.theme
+import qs.components
+import qs.services
 
 /// Battery, shown on a warning threshold or when the power source changes.
 /// Coloured by severity — this is one of the few places in the shell where

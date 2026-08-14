@@ -1,10 +1,10 @@
 import QtQuick
 import Quickshell
 import Quickshell.Widgets
-import "root:/"
-import "root:/theme"
-import "root:/components"
-import "root:/services"
+import qs
+import qs.theme
+import qs.components
+import qs.services
 
 /*
  * A notification, folded into the island.
@@ -67,16 +67,19 @@ Item {
             antialiasing: true
 
             IconImage {
+                id: appIcon
                 anchors.centerIn: parent
                 width: parent.width - 12
                 height: width
-                visible: root.iconSource !== ""
+                // Status, not source: an app can name an icon the theme does
+                // not have, which resolves to a path that fails to load.
+                visible: status === Image.Ready
                 source: root.iconSource
             }
 
             Icon {
                 anchors.centerIn: parent
-                visible: root.iconSource === ""
+                visible: appIcon.status !== Image.Ready
                 fallbackGlyph: Glyphs.bell
                 size: 17
                 color: Theme.textTertiary

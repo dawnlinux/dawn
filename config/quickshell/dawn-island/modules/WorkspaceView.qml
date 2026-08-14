@@ -1,9 +1,9 @@
 import QtQuick
 import Quickshell
-import "root:/"
-import "root:/theme"
-import "root:/components"
-import "root:/services"
+import qs
+import qs.theme
+import qs.components
+import qs.services
 
 /*
  * Workspace switch.

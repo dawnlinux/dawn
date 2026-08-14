@@ -2,7 +2,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
-import "root:/"
+import qs
 
 /*
  * The island's state machine.

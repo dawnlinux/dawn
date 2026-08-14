@@ -1,6 +1,6 @@
 import QtQuick
-import "root:/"
-import "root:/theme"
+import qs
+import qs.theme
 
 /*
  * The week strip from the reference: seven columns centred on today, weekday

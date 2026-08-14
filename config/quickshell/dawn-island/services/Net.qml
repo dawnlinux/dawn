@@ -3,7 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Networking
-import "root:/"
+import qs
 
 /*
  * Network state via Quickshell's NetworkManager binding — no nmcli polling.
@@ -59,6 +59,16 @@ Singleton {
         if (wiredUp && wiredDevice) return wiredDevice.address || "";
         if (wifiUp && wifiDevice) return wifiDevice.address || "";
         return "";
+    }
+
+    /// NetworkManager owns the radio state and reports it back through
+    /// `wifiEnabled`, so nothing here tracks it optimistically.
+    function setWifi(on) {
+        Networking.wifiEnabled = on;
+    }
+
+    function toggleWifi() {
+        setWifi(!Networking.wifiEnabled);
     }
 
     signal connectivityChanged(bool connected, string kind)
