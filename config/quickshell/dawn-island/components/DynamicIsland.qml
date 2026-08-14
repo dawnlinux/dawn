@@ -38,6 +38,7 @@ Item {
     /// you want the panel, not whatever briefly happened.
     readonly property string viewState:
           IslandState.current === "launcher"          ? "launcher"
+        : IslandState.current === "power"             ? "power"
         : IslandState.current === "wallpaper"         ? "wallpaper"
         : IslandState.current === "notifcenter"       ? "notifcenter"
         : IslandState.current === "status"            ? "status"
@@ -50,6 +51,7 @@ Item {
     readonly property bool wantsKeyboard:
         viewState === "launcher" || viewState === "status"
         || viewState === "wallpaper" || viewState === "notifcenter"
+        || viewState === "power"
 
     property bool hoverExpanded: false
     property bool pinned: false
@@ -119,6 +121,7 @@ Item {
     function componentFor(state) {
         switch (state) {
         case "launcher":     return launcherView;
+        case "power":        return powerView;
         case "wallpaper":    return wallpaperView;
         case "notifcenter":  return notifCenterView;
         case "status":       return statusView;
@@ -144,6 +147,7 @@ Item {
     Component { id: launcherView; LauncherView {} }
     Component { id: statusView; StatusView {} }
     Component { id: wallpaperView; WallpaperView {} }
+    Component { id: powerView; PowerView {} }
     Component { id: notifCenterView; NotifCenterView {} }
     Component { id: volumeView; VolumeView {} }
     Component { id: brightnessView; BrightnessView {} }
@@ -245,6 +249,8 @@ Item {
                 Wallpaper.hide();
             else if (root.viewState === "notifcenter")
                 Notifs.hide();
+            else if (root.viewState === "power")
+                Session.hide();
             else if (root.viewState === "status")
                 Nav.hide();
             else if (Config.rightClickCommand !== "")

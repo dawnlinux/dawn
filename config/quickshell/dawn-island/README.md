@@ -76,6 +76,7 @@ running.
 | `Super+I`       | status panel — wifi, bluetooth, battery, volume, backlight |
 | `Super+Shift+W` | wallpaper carousel                                       |
 | `Super+N`       | notification centre                                      |
+| `Super+M`       | session menu — lock, sleep, log out, restart, shut down   |
 | `Super+.`       | expanded panel, the keyboard equivalent of hovering      |
 
 Inside the status panel:
@@ -182,11 +183,37 @@ Note that arrival times are the shell's own. The freedesktop spec carries no
 timestamp, so `Notifs.recent` holds `{ n, at }` wrappers rather than bare
 notifications — that pair is the only place the age can live.
 
+### Session menu
+
+`Super+M` unfolds the notch into the same carousel the wallpapers use — two
+panels that move identically are one thing to learn — but the tiles are verbs,
+so each is an icon and a word rather than a picture.
+
+Lock and Sleep fire on `⏎`. **Log Out, Restart and Shut Down ask twice**: the
+first `⏎` arms the tile red and the panel says so, the second runs it, and the
+arming lapses after three seconds or the moment you move off. This panel takes
+exclusive keyboard focus, so a stray Enter arriving as it opens must not be able
+to power the machine off — which is also why `Space` is unbound here, why it
+always opens on the least destructive entry, and why hover cannot move the
+selection for the first 400ms.
+
+Log out goes through `uwsm stop` rather than killing Hyprland, because SDDM
+starts this session as `uwsm start -e -D Hyprland` and the compositor is a
+systemd user unit; killing it directly strands that unit.
+
+Lock only appears when a locker is actually installed — there is none on this
+machine today, so the tile is hidden until `hyprlock` or `swaylock` shows up.
+Hibernate is deliberately absent: it needs swap at least the size of RAM and a
+`resume=` kernel parameter, and this machine has neither, so it would suspend
+and never come back.
+
+See [KEYMAP.md](KEYMAP.md) for every binding in one place.
+
 ### One panel at a time
 
-The launcher, the status panel, the wallpaper carousel and the notification
-centre all take exclusive keyboard focus, so only one is ever up; opening any of
-them closes the others.
+The launcher, the status panel, the wallpaper carousel, the notification centre
+and the session menu all take exclusive keyboard focus, so only one is ever up;
+opening any of them closes the others.
 Clicking anywhere else closes whichever is open.
 
 To rebind, change the keys in `~/.config/hypr/modules/binds.lua`; the shortcut
@@ -198,6 +225,7 @@ hl.bind("SUPER + SPACE",     hl.dsp.global("quickshell:launcher"))
 hl.bind("SUPER + I",         hl.dsp.global("quickshell:status"))
 hl.bind("SUPER + SHIFT + W", hl.dsp.global("quickshell:wallpaper"))
 hl.bind("SUPER + N",         hl.dsp.global("quickshell:notifications"))
+hl.bind("SUPER + M",         hl.dsp.global("quickshell:power"))
 hl.bind("SUPER + PERIOD",    hl.dsp.global("quickshell:island"))
 ```
 

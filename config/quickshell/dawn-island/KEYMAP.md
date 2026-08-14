@@ -23,14 +23,16 @@ anywhere, and do nothing at all when the shell isn't running.
 | `Super+I` | Status panel | `quickshell:status` |
 | `Super+N` | Notification centre | `quickshell:notifications` |
 | `Super+Shift+W` | Wallpaper carousel | `quickshell:wallpaper` |
+| `Super+M` | Session menu — lock, sleep, log out, restart, shut down | `quickshell:power` |
 | `Super+.` | Expanded panel — the keyboard equivalent of hovering | `quickshell:island` |
 | `Super+R` | Restart the shell (runs `launch.sh`) | — (plain `exec`) |
 
 Each key toggles: pressing it again closes what it opened.
 
-Only one panel is ever up. The launcher, status panel, notification centre and
-wallpaper carousel all take exclusive keyboard focus, so opening any of them
-closes the others; clicking anywhere else closes whichever is open.
+Only one panel is ever up. The launcher, status panel, notification centre,
+wallpaper carousel and session menu all take exclusive keyboard focus, so
+opening any of them closes the others; clicking anywhere else closes whichever
+is open.
 
 ---
 
@@ -57,9 +59,10 @@ mean the letter j.
 | Status panel | adjust down | move down | move up | adjust up |
 | Notification centre | — | move down | move up | — |
 | Wallpaper carousel | previous | next | previous | next |
+| Session menu | previous | next | previous | next |
 | App launcher | *types the letter* | | | |
 
-In the carousel `jk` are synonyms for `hl` rather than dead keys — the axis is
+In both carousels `jk` are synonyms for `hl` rather than dead keys — the axis is
 horizontal and there is no second one for them to mean.
 
 ### App launcher — `Super+Space`
@@ -120,6 +123,43 @@ the list while it is on. `Critical` urgency ignores DND entirely.
 | `Tab` / `Shift+Tab` | Next / previous |
 | `Esc` | Close |
 
+### Session menu — `Super+M`
+
+Tiles: Lock, Sleep, Log Out, Restart, Shut Down. Lock only appears when a
+locker is actually installed.
+
+| Key | Does |
+| --- | --- |
+| `←` `→` / `h` `l` / `k` `j` | Choose |
+| `⏎` | Run it — **twice** for Log Out, Restart and Shut Down |
+| `Esc` | Close |
+
+**Destructive entries confirm.** Lock and Sleep are undoable in a keypress and
+fire immediately. Log Out, Restart and Shut Down arm on the first `⏎` — the tile
+turns red and the panel says "Press Enter again — this cannot be undone" — and
+run on the second. Arming lapses after 3 seconds (`Config.powerConfirmTimeout`),
+and moving off the tile disarms it, because the confirmation belongs to the
+action you were looking at.
+
+`Space` is deliberately **not** bound here, unlike the wallpaper carousel: it is
+the key most likely to be pressed by accident, and this is the panel where that
+matters. The menu also always opens on the least destructive entry, and hover
+cannot move the selection for the first 400ms — otherwise opening the notch
+under a resting cursor would pick a tile for you.
+
+Commands are in `Config.qml`:
+
+```qml
+property string logoutCommand: "uwsm stop"          // SDDM starts this session via uwsm
+property string sleepCommand: "systemctl suspend"
+property string restartCommand: "systemctl reboot"
+property string shutdownCommand: "systemctl poweroff"
+property string lockCommand: "hyprlock"             // tile hidden if not installed
+```
+
+Hibernate is deliberately absent: it needs swap at least the size of RAM and a
+`resume=` kernel parameter, and this machine has neither.
+
 ---
 
 ## Pointer
@@ -150,6 +190,7 @@ These are Hyprland binds that sit next to the island's and are easy to confuse:
 | `Super+W` | Hyprland | Close window — *not* the wallpaper carousel (`Super+Shift+W`) |
 | `Super+N` | dawn-island | Notification centre — was swaync until swaync was retired |
 | `Super+R` | dawn-island | Restart the shell — rarely needed, Quickshell hot-reloads on save |
+| `Super+M` | dawn-island | Session menu — used to be a straight-to-shutdown bind with no confirmation |
 
 To rebind anything, change the key in `binds.lua`; the shortcut *names*
 (`quickshell:launcher` and friends) are defined in `Config.qml` and should stay

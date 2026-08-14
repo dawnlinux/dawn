@@ -37,7 +37,8 @@ Item {
     readonly property var _vectorNames: [
         "play", "pause", "next", "prev", "speaker", "sun",
         "battery", "wifi", "ethernet", "bluetooth", "bell", "copy", "dot",
-        "check", "close", "search", "arch"
+        "check", "close", "search", "arch",
+        "power", "restart", "moon", "logout", "lock"
     ]
     readonly property bool isVector: _vectorNames.indexOf(name) !== -1
 
@@ -404,6 +405,188 @@ Item {
                     startX: 4.5; startY: 4.5
                     PathLine { x: 19.5; y: 19.5 }
                 }
+            }
+        }
+
+        // — power —
+        //
+        // The IEC symbol: a ring broken at the top with a stroke through the
+        // gap. The gap has to be wide enough to read at 15px, which is wider
+        // than the standard draws it.
+        Item {
+            visible: root.name === "power"
+            anchors.fill: parent
+
+            Shape {
+                anchors.fill: parent
+                preferredRendererType: Shape.CurveRenderer
+                ShapePath {
+                    fillColor: "transparent"
+                    strokeColor: root.color
+                    strokeWidth: 2.0
+                    capStyle: ShapePath.RoundCap
+                    PathAngleArc {
+                        centerX: 12; centerY: 12.8
+                        radiusX: 7.6; radiusY: 7.6
+                        startAngle: -68
+                        sweepAngle: 316
+                    }
+                }
+            }
+            Rectangle {
+                x: 12 - width / 2; y: 2.6
+                width: 2.0; height: 9.2
+                radius: 1
+                color: root.color
+                antialiasing: true
+            }
+        }
+
+        // — restart —
+        //
+        // Three-quarter ring with a solid arrowhead, rather than a ring with a
+        // stroked chevron: at this size a stroked head reads as a smudge.
+        Item {
+            visible: root.name === "restart"
+            anchors.fill: parent
+
+            Shape {
+                anchors.fill: parent
+                preferredRendererType: Shape.CurveRenderer
+                ShapePath {
+                    fillColor: "transparent"
+                    strokeColor: root.color
+                    strokeWidth: 2.0
+                    capStyle: ShapePath.RoundCap
+                    PathAngleArc {
+                        centerX: 12; centerY: 12
+                        radiusX: 7.4; radiusY: 7.4
+                        startAngle: -50
+                        sweepAngle: 285
+                    }
+                }
+                ShapePath {
+                    fillColor: root.color
+                    strokeColor: root.color
+                    strokeWidth: 0.6
+                    joinStyle: ShapePath.RoundJoin
+                    startX: 16.8; startY: 1.6
+                    PathLine { x: 20.4; y: 7.4 }
+                    PathLine { x: 13.8; y: 7.0 }
+                    PathLine { x: 16.8; y: 1.6 }
+                }
+            }
+        }
+
+        // — moon (sleep) —
+        //
+        // A thick round-capped arc rather than a filled crescent. Two arcs
+        // enclosing a crescent is the "correct" construction and it is a
+        // nuisance to get right — the radii have to agree about where they
+        // intersect or the fill collapses to a sliver. A fat open ring reads
+        // as a moon at every size this icon is ever drawn at, and cannot go
+        // wrong. It also stays a crescent on a translucent surface, which a
+        // punched-out circle would not.
+        Shape {
+            visible: root.name === "moon"
+            anchors.fill: parent
+            preferredRendererType: Shape.CurveRenderer
+            ShapePath {
+                fillColor: "transparent"
+                strokeColor: root.color
+                strokeWidth: 3.6
+                capStyle: ShapePath.RoundCap
+                PathAngleArc {
+                    centerX: 12.8; centerY: 12
+                    radiusX: 6.4; radiusY: 6.4
+                    // Opening to the upper right, the way a waxing moon sits.
+                    startAngle: 48
+                    sweepAngle: 264
+                }
+            }
+        }
+
+        // — logout —
+        //
+        // Arrow leaving an open bracket. The bracket is open on the side the
+        // arrow exits, so the mark reads as "out of" rather than "into a box".
+        Item {
+            visible: root.name === "logout"
+            anchors.fill: parent
+
+            Shape {
+                anchors.fill: parent
+                preferredRendererType: Shape.CurveRenderer
+                ShapePath {
+                    fillColor: "transparent"
+                    strokeColor: root.color
+                    strokeWidth: 1.9
+                    capStyle: ShapePath.RoundCap
+                    joinStyle: ShapePath.RoundJoin
+                    startX: 13.2; startY: 4.2
+                    PathLine { x: 5.4; y: 4.2 }
+                    PathLine { x: 5.4; y: 19.8 }
+                    PathLine { x: 13.2; y: 19.8 }
+                }
+                // Shaft.
+                ShapePath {
+                    fillColor: "transparent"
+                    strokeColor: root.color
+                    strokeWidth: 1.9
+                    capStyle: ShapePath.RoundCap
+                    startX: 10.6; startY: 12
+                    PathLine { x: 19.4; y: 12 }
+                }
+                // Head.
+                ShapePath {
+                    fillColor: root.color
+                    strokeColor: root.color
+                    strokeWidth: 0.6
+                    joinStyle: ShapePath.RoundJoin
+                    startX: 21.2; startY: 12
+                    PathLine { x: 16.4; y: 8.6 }
+                    PathLine { x: 16.4; y: 15.4 }
+                    PathLine { x: 21.2; y: 12 }
+                }
+            }
+        }
+
+        // — lock —
+        Item {
+            visible: root.name === "lock"
+            anchors.fill: parent
+
+            // Shackle, drawn behind the body so the join is hidden.
+            Shape {
+                anchors.fill: parent
+                preferredRendererType: Shape.CurveRenderer
+                ShapePath {
+                    fillColor: "transparent"
+                    strokeColor: root.color
+                    strokeWidth: 1.9
+                    capStyle: ShapePath.RoundCap
+                    PathAngleArc {
+                        centerX: 12; centerY: 10.2
+                        radiusX: 4.3; radiusY: 4.3
+                        startAngle: 180
+                        sweepAngle: 180
+                    }
+                }
+            }
+            Rectangle {
+                x: 4.6; y: 10.0
+                width: 14.8; height: 10.4
+                radius: 2.6
+                color: root.color
+                antialiasing: true
+            }
+            // Keyhole, punched in the surface colour so it reads on the body.
+            Rectangle {
+                x: 12 - width / 2; y: 13.4
+                width: 2.0; height: 3.8
+                radius: 1
+                color: Theme.background
+                antialiasing: true
             }
         }
 

@@ -48,11 +48,11 @@ hl.bind(mainMod .. " + N", hl.dsp.global("quickshell:notifications"),
 	{ description = "Notification Centre (dawn-island)" })
 hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("flameshot gui --clipboard"), { description = "Screenshot" })
 
-hl.bind(
-	mainMod .. " + M",
-	hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"),
-	{ description = "Shutdown / Exit Hyprland" }
-)
+-- Session menu: lock / sleep / log out / restart / shut down, as a carousel in
+-- the island. Replaces the old straight-to-shutdown bind, which had no
+-- confirmation and no way back out. Destructive entries ask twice.
+hl.bind(mainMod .. " + M", hl.dsp.global("quickshell:power"),
+	{ description = "Session Menu (dawn-island)" })
 
 -- Global clipboard (requires wtype)
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("wtype -M ctrl -M shift c -m shift -m ctrl"),

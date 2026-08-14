@@ -145,8 +145,13 @@ Item {
         // A straight line with attributes ramped along it. The scale and
         // opacity curves are what make it read as depth rather than as a row
         // of shrunken thumbnails.
+        // Inset by half the width a tile has once the path has scaled it down,
+        // so the outermost tiles land fully inside the panel rather than being
+        // sliced in half against the clip.
+        readonly property real endInset: Config.wallpaperTileWidth * 0.58 / 2 + 4
+
         path: Path {
-            startX: 0
+            startX: view.endInset
             startY: view.height / 2
 
             PathAttribute { name: "tileScale";   value: 0.58 }
@@ -159,7 +164,7 @@ Item {
             PathAttribute { name: "tileOpacity"; value: 1.0 }
             PathAttribute { name: "tileZ";       value: 20 }
 
-            PathLine { x: view.width; y: view.height / 2 }
+            PathLine { x: view.width - view.endInset; y: view.height / 2 }
 
             PathAttribute { name: "tileScale";   value: 0.58 }
             PathAttribute { name: "tileOpacity"; value: 0.22 }

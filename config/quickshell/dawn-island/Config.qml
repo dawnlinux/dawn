@@ -71,6 +71,14 @@ Singleton {
     /// How many tiles are on the path at once. Odd numbers centre cleanly.
     property int wallpaperVisibleTiles: 5
 
+    /// Session / power carousel. Tiles are square-ish cards rather than the
+    /// wallpaper's 16:9 crops — an icon and a word, not a picture.
+    property int powerWidth: 520
+    property int powerHeaderHeight: 32
+    property int powerTileWidth: 122
+    property int powerTileHeight: 96
+    property int powerVisibleTiles: 5
+
     /// Notification centre. Rows are taller than the status panel's because
     /// each carries three lines — app, summary, body — not one.
     property int notifCenterWidth: 430
@@ -186,6 +194,9 @@ Singleton {
         "status":       190,
         "notifcenter":  192,
         "wallpaper":    195,
+        /// Above the rest: if you asked to shut the machine down, nothing
+        /// arriving afterwards is more important than that question.
+        "power":        198,
         "launcher":     200
     })
 
@@ -213,6 +224,9 @@ Singleton {
     /// The notification centre. Off leaves the transient banners working and
     /// only removes the history panel.
     property bool enableNotifCenter: true
+
+    /// The session / power carousel.
+    property bool enablePower: true
 
     /// Quickshell must own org.freedesktop.Notifications to receive these.
     /// If another daemon (swaync, dunst, mako) is running it will win the bus
@@ -246,6 +260,7 @@ Singleton {
     readonly property string islandShortcut: "island"
     readonly property string wallpaperShortcut: "wallpaper"
     readonly property string notificationsShortcut: "notifications"
+    readonly property string powerShortcut: "power"
 
     /// Step sizes for the status panel's Left/Right keys.
     property real volumeKeyStep: 0.05
@@ -333,6 +348,26 @@ Singleton {
 
     /// Announce when the battery drops past any of these percentages.
     property var batteryWarnLevels: [20, 10, 5]
+
+    // ─────────────────────────────────────────────────────────────────────
+    //  Session / power
+    // ─────────────────────────────────────────────────────────────────────
+
+    /// Log out goes through uwsm because SDDM starts this session with
+    /// `uwsm start -e -D Hyprland`, which makes the compositor a systemd user
+    /// unit. Killing Hyprland directly strands that unit; `uwsm stop` is the
+    /// wind-down the session manager expects. On a session started some other
+    /// way, `hyprctl dispatch "hl.dsp.exit()"` is the right value here.
+    property string logoutCommand: "uwsm stop"
+    property string sleepCommand: "systemctl suspend"
+    property string restartCommand: "systemctl reboot"
+    property string shutdownCommand: "systemctl poweroff"
+
+    /// Only offered when one of these is actually installed — see Session.qml.
+    property string lockCommand: "hyprlock"
+
+    /// How long a destructive tile stays armed waiting for the second Enter.
+    property int powerConfirmTimeout: 3000
 
     // ─────────────────────────────────────────────────────────────────────
     //  Wallpaper

@@ -66,6 +66,13 @@ ShellRoot {
 
     GlobalShortcut {
         appid: "quickshell"
+        name: Config.powerShortcut
+        description: "Toggle the dawn-island session menu"
+        onPressed: Session.toggle()
+    }
+
+    GlobalShortcut {
+        appid: "quickshell"
         name: Config.islandShortcut
         description: "Toggle the dawn-island expanded panel"
         onPressed: Nav.togglePanel()
@@ -125,7 +132,10 @@ ShellRoot {
                                        Config.notifCenterHeaderHeight
                                          + Config.notifCenterMaxRows
                                            * Config.notifCenterRowHeight
-                                         + 20)
+                                         + 20,
+                                       Config.powerHeaderHeight
+                                         + Config.powerTileHeight
+                                         + 70)
                             + Config.shadowPadding
 
             /// Windows must not tile under the notch, but they may tile under
@@ -161,6 +171,7 @@ ShellRoot {
                     Nav.hide();
                     Wallpaper.hide();
                     Notifs.hide();
+                    Session.hide();
                 }
             }
 
