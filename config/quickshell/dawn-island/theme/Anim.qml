@@ -20,6 +20,9 @@ Singleton {
     readonly property int content: Config.animationsEnabled ? Config.contentDuration : 0
     readonly property int fade: Config.animationsEnabled ? Config.fadeDuration : 0
     readonly property int quick: Config.animationsEnabled ? Config.quickDuration : 0
+    /// The accent crossfade when the wallpaper changes. Long by the standards
+    /// of everything else here, because it is ambient rather than a response.
+    readonly property int accent: Config.animationsEnabled ? Config.accentDuration : 0
 
     // ── Easing ────────────────────────────────────────────────────────────
     /// Used for the shape morph only when Config.useRealSpring is false.

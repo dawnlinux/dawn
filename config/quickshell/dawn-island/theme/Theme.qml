@@ -53,9 +53,21 @@ Singleton {
 
     // ── Accent ────────────────────────────────────────────────────────────
     /// Base accent. Monochrome by default, matching the rest of dawn.
-    /// AccentService overrides `accent` when wallpaper derivation is enabled.
+    /// services/Accent.qml overrides `accent` when wallpaper derivation is on.
     readonly property color accentBase: "#f2f2f2"
     property color accent: accentBase
+
+    /// Everything accented in the shell crossfades together when the wallpaper
+    /// changes, rather than the desktop switching colour on a single frame.
+    /// Deliberately slower than the island's springs: this is the room
+    /// changing light, not a control answering a press.
+    Behavior on accent {
+        enabled: Anim.accent > 0
+        ColorAnimation {
+            duration: Anim.accent
+            easing.type: Easing.InOutQuad
+        }
+    }
 
     readonly property color positive: "#7ec699"
     readonly property color warning: "#e8c07d"

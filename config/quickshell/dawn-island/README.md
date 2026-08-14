@@ -152,6 +152,62 @@ Thumbnails are decoded at twice the tile size and no larger; a folder of 4K
 photographs is the normal case and loading them at native resolution to draw
 them 176px wide is how a wallpaper picker ends up eating a gigabyte.
 
+### The accent follows the wallpaper
+
+Setting a wallpaper retints the shell. The launcher's selection, the focused
+workspace dot, the status panel's marker and the rest of `Theme.accent`
+crossfade to a colour taken from the image, over `Config.accentDuration`.
+
+**The wallpaper chooses the hue. Dawn chooses everything else.**
+
+That split is the whole design. Lifting a colour out of an image wholesale
+gives you whatever the image happened to contain — a muddy olive from a forest
+photo, a near-black from a dark one, something acid from a poster — and half of
+those cannot be read on a black island beside `#f2f2f2` text. So only the hue
+survives the trip; saturation and lightness are fixed in `Config`:
+
+```qml
+property real accentSaturation: 0.52
+property real accentLightness:  0.80
+```
+
+Tuned so a derived accent lands in the same family as dawn's own pink
+(`#e8b9e0`). Every wallpaper ends up somewhere in that family, and the shell
+stays recognisably itself while still answering to what is behind it.
+
+A wallpaper with no colour in it gets no colour out. A black-and-white
+photograph scores exactly zero and keeps `Theme.accentBase`, rather than being
+assigned an invented hue from sensor noise.
+
+#### How the colour is picked
+
+Nothing in the shell decodes an image. `ffmpeg` scales the wallpaper to 16×16
+in its own process and exits; the shell only ever sees 768 bytes, which is why
+sampling a 4K photograph is free. `od` turns those bytes into decimal text,
+because `StdioCollector` reads text and raw RGB contains NULs.
+
+Hues are then voted for in buckets rather than averaged, because **a mean over
+hue is always wrong**: hue is an angle, so red at 350° and red at 10° average to
+cyan, and even without the wraparound the mean of a blue sky and an orange
+sunset is the grey between them. Every pixel votes for one of 24 buckets, the
+heaviest bucket wins — scored together with its two neighbours, so a hue on a
+boundary cannot split its own vote — and only inside the winner is a mean taken,
+as a circular mean, the one form that survives the 360°/0° seam.
+
+Votes are weighted by **chroma squared**. Chroma alone lets a large field of
+nearly-grey outvote a small vivid subject. Higher powers are unstable: measured
+across a folder of eleven wallpapers, squaring agrees with linear on every
+single one, while cubing flips one image from blue to amber and a fourth power
+flips another from teal to red. Squared is the strongest weighting that still
+picks the colour a person would.
+
+Near-black and blown-out pixels are skipped entirely. Their hue is real but
+worthless — a couple of bits of noise away from anywhere on the wheel.
+
+Turn the whole thing off with `Config.deriveAccentFromWallpaper = false`, and
+the accent is the monochrome `#f2f2f2` it was before. Without `ffmpeg`
+installed, the same thing happens silently.
+
 ### Notification centre
 
 `Super+N`. A notification used to live for four and a half seconds and then be
@@ -249,6 +305,7 @@ Everything below was already present on this machine; nothing was installed.
 | `bluez`          | bluetooth adapter and device state      | optional                      |
 | `awww`           | setting the wallpaper from the carousel | optional                      |
 | `upower`         | battery                                 | optional                      |
+| `ffmpeg`         | sampling the wallpaper for the accent   | optional                      |
 | Inter            | UI typeface                             | falls back to sans-serif      |
 | JetBrainsMono NF | icon glyphs where no vector icon exists | falls back to a missing glyph |
 
@@ -307,6 +364,8 @@ modules/             one file per thing the island can show
 services/            facts about the system; none of them know the island exists
   IslandState.qml      the state machine — priority, expiry, payloads
   EventRouter.qml      the only place that turns a fact into "show this"
+  Accent.qml           wallpaper → Theme.accent; the only service that
+                       writes to the theme rather than announcing a fact
   Audio, Brightness, Clipboard, Clock, Hypr, Media, Net, Notifs, Power
 
 theme/               Theme (colour, metrics), Typography, Anim, Glyphs
@@ -420,9 +479,6 @@ layout rather than a hole. Native players (mpd, Spotify, VLC…) supply both.
 
 - **Notification actions with inline replies.** The server advertises
   `inlineReplySupported: false`; the island invokes default actions only.
-- **Wallpaper-derived accent colour.** `Config.deriveAccentFromWallpaper`
-  exists as a switch and `Theme.accent` is a single override point, but nothing
-  extracts a colour yet. The shell is monochrome by design and does not need it.
 - **Recording state.** Listed in the brief's state list; there is no recorder on
   this machine to detect, so no service was written for it. Adding one is a file
   in `services/` and a line in `EventRouter.qml`.
