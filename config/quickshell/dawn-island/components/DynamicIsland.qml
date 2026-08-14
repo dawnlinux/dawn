@@ -39,6 +39,7 @@ Item {
     readonly property string viewState:
           IslandState.current === "launcher"          ? "launcher"
         : IslandState.current === "wallpaper"         ? "wallpaper"
+        : IslandState.current === "notifcenter"       ? "notifcenter"
         : IslandState.current === "status"            ? "status"
         : (pinned || hoverExpanded || Nav.panelPinned) ? "expanded"
         : IslandState.current
@@ -48,7 +49,7 @@ Item {
     /// expanded would take every keystroke on the machine.
     readonly property bool wantsKeyboard:
         viewState === "launcher" || viewState === "status"
-        || viewState === "wallpaper"
+        || viewState === "wallpaper" || viewState === "notifcenter"
 
     property bool hoverExpanded: false
     property bool pinned: false
@@ -119,6 +120,7 @@ Item {
         switch (state) {
         case "launcher":     return launcherView;
         case "wallpaper":    return wallpaperView;
+        case "notifcenter":  return notifCenterView;
         case "status":       return statusView;
         case "expanded":     return expandedView;
         case "notification": return notificationView;
@@ -142,6 +144,7 @@ Item {
     Component { id: launcherView; LauncherView {} }
     Component { id: statusView; StatusView {} }
     Component { id: wallpaperView; WallpaperView {} }
+    Component { id: notifCenterView; NotifCenterView {} }
     Component { id: volumeView; VolumeView {} }
     Component { id: brightnessView; BrightnessView {} }
     Component { id: workspaceView; WorkspaceView {} }
@@ -240,6 +243,8 @@ Item {
                 Launcher.hide();
             else if (root.viewState === "wallpaper")
                 Wallpaper.hide();
+            else if (root.viewState === "notifcenter")
+                Notifs.hide();
             else if (root.viewState === "status")
                 Nav.hide();
             else if (Config.rightClickCommand !== "")

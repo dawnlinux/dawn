@@ -75,6 +75,7 @@ running.
 | `Super+Space`   | app launcher — type to search, `↑↓` select, `⏎` launch  |
 | `Super+I`       | status panel — wifi, bluetooth, battery, volume, backlight |
 | `Super+Shift+W` | wallpaper carousel                                       |
+| `Super+N`       | notification centre                                      |
 | `Super+.`       | expanded panel, the keyboard equivalent of hovering      |
 
 Inside the status panel:
@@ -150,10 +151,42 @@ Thumbnails are decoded at twice the tile size and no larger; a folder of 4K
 photographs is the normal case and loading them at native resolution to draw
 them 176px wide is how a wallpaper picker ends up eating a gigabyte.
 
+### Notification centre
+
+`Super+N`. A notification used to live for four and a half seconds and then be
+gone for good — fine for a volume change, indefensible for a message that landed
+while something was fullscreen. This is the other half: the same events, kept
+(`Notifs.recent`, capped at 12), reachable on purpose rather than by luck.
+
+| Key               | Does                                                  |
+| ----------------- | ----------------------------------------------------- |
+| `↑` `↓`           | move the selection                                    |
+| `⏎`               | run the notification's default action, then dismiss it |
+| `Backspace`       | dismiss the selected one                              |
+| `Shift+Backspace` | clear all                                             |
+| `d`               | do not disturb                                        |
+| `Esc`             | close                                                 |
+
+Same verbs as the status panel, deliberately — learning the island once should
+be enough to drive all of it. Rows show the app, how long ago it arrived, the
+summary and a line of body; the `⏎` hint only appears on rows that actually
+carry an action, so it never promises something the notification cannot do.
+Critical notifications keep their own colour even while selected.
+
+**Do not disturb** suppresses the interruption, not the record. Notifications
+still land in the list while `d` is on — silencing something by throwing it away
+is how you miss the one that mattered. `Critical` urgency ignores DND entirely,
+which is what that level is for: a full disk does not respect your quiet hours.
+
+Note that arrival times are the shell's own. The freedesktop spec carries no
+timestamp, so `Notifs.recent` holds `{ n, at }` wrappers rather than bare
+notifications — that pair is the only place the age can live.
+
 ### One panel at a time
 
-The launcher, the status panel and the wallpaper carousel all take exclusive
-keyboard focus, so only one is ever up; opening any of them closes the others.
+The launcher, the status panel, the wallpaper carousel and the notification
+centre all take exclusive keyboard focus, so only one is ever up; opening any of
+them closes the others.
 Clicking anywhere else closes whichever is open.
 
 To rebind, change the keys in `~/.config/hypr/modules/binds.lua`; the shortcut
@@ -164,6 +197,7 @@ and `islandShortcut`:
 hl.bind("SUPER + SPACE",     hl.dsp.global("quickshell:launcher"))
 hl.bind("SUPER + I",         hl.dsp.global("quickshell:status"))
 hl.bind("SUPER + SHIFT + W", hl.dsp.global("quickshell:wallpaper"))
+hl.bind("SUPER + N",         hl.dsp.global("quickshell:notifications"))
 hl.bind("SUPER + PERIOD",    hl.dsp.global("quickshell:island"))
 ```
 
@@ -358,8 +392,6 @@ layout rather than a hole. Native players (mpd, Spotify, VLC…) supply both.
 
 - **Notification actions with inline replies.** The server advertises
   `inlineReplySupported: false`; the island invokes default actions only.
-- **A notification centre.** Recent notifications are kept in memory
-  (`Notifs.recent`, capped at 12) but there is no history panel yet.
 - **Wallpaper-derived accent colour.** `Config.deriveAccentFromWallpaper`
   exists as a switch and `Theme.accent` is a single override point, but nothing
   extracts a colour yet. The shell is monochrome by design and does not need it.

@@ -41,7 +41,11 @@ hl.bind(mainMod .. " + SHIFT + W", hl.dsp.global("quickshell:wallpaper"),
 	{ description = "Wallpaper Carousel (dawn-island)" })
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/quickshell/dawn-island/launch.sh"),
 	{ description = "Restart Shell (dawn-island)" })
-hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("swaync-client --toggle-panel"), { description = "Toggle Notification Panel" })
+-- The island owns org.freedesktop.Notifications now, so swaync is gone and
+-- swaync-client was a no-op. ↑↓ walks the history, Enter runs the
+-- notification's action, Backspace dismisses, d silences.
+hl.bind(mainMod .. " + N", hl.dsp.global("quickshell:notifications"),
+	{ description = "Notification Centre (dawn-island)" })
 hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("flameshot gui --clipboard"), { description = "Screenshot" })
 
 hl.bind(

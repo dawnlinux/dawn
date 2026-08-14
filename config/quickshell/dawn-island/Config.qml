@@ -71,6 +71,14 @@ Singleton {
     /// How many tiles are on the path at once. Odd numbers centre cleanly.
     property int wallpaperVisibleTiles: 5
 
+    /// Notification centre. Rows are taller than the status panel's because
+    /// each carries three lines — app, summary, body — not one.
+    property int notifCenterWidth: 430
+    property int notifCenterHeaderHeight: 32
+    property int notifCenterRowHeight: 64
+    /// The list scrolls past this; the island does not keep growing.
+    property int notifCenterMaxRows: 5
+
     /// Keyboard-driven status panel (wifi, bluetooth, battery, volume,
     /// brightness). Sized like the launcher so the two read as one family.
     property int statusWidth: 360
@@ -176,6 +184,7 @@ Singleton {
         /// The launcher, the status panel and the wallpaper carousel are the
         /// states the user opened deliberately, so nothing may interrupt them.
         "status":       190,
+        "notifcenter":  192,
         "wallpaper":    195,
         "launcher":     200
     })
@@ -200,6 +209,10 @@ Singleton {
 
     /// The wallpaper carousel.
     property bool enableWallpaper: true
+
+    /// The notification centre. Off leaves the transient banners working and
+    /// only removes the history panel.
+    property bool enableNotifCenter: true
 
     /// Quickshell must own org.freedesktop.Notifications to receive these.
     /// If another daemon (swaync, dunst, mako) is running it will win the bus
@@ -232,6 +245,7 @@ Singleton {
     readonly property string statusShortcut: "status"
     readonly property string islandShortcut: "island"
     readonly property string wallpaperShortcut: "wallpaper"
+    readonly property string notificationsShortcut: "notifications"
 
     /// Step sizes for the status panel's Left/Right keys.
     property real volumeKeyStep: 0.05

@@ -59,6 +59,13 @@ ShellRoot {
 
     GlobalShortcut {
         appid: "quickshell"
+        name: Config.notificationsShortcut
+        description: "Toggle the dawn-island notification centre"
+        onPressed: Notifs.toggle()
+    }
+
+    GlobalShortcut {
+        appid: "quickshell"
         name: Config.islandShortcut
         description: "Toggle the dawn-island expanded panel"
         onPressed: Nav.togglePanel()
@@ -114,7 +121,11 @@ ShellRoot {
                                          + 20,
                                        Config.wallpaperHeaderHeight
                                          + Config.wallpaperTileHeight
-                                         + 70)
+                                         + 70,
+                                       Config.notifCenterHeaderHeight
+                                         + Config.notifCenterMaxRows
+                                           * Config.notifCenterRowHeight
+                                         + 20)
                             + Config.shadowPadding
 
             /// Windows must not tile under the notch, but they may tile under
@@ -149,6 +160,7 @@ ShellRoot {
                     Launcher.hide();
                     Nav.hide();
                     Wallpaper.hide();
+                    Notifs.hide();
                 }
             }
 
