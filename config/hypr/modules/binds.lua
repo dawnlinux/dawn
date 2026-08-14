@@ -25,7 +25,7 @@ hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("firefox"), { description = "Open Bro
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu), { description = "App Launcher" })
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/waybar/launch.sh"), { description = "Restart Waybar" })
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("swaync-client --toggle-panel"), { description = "Toggle Notification Panel" })
-hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("flameshot full"), { description = "Screenshot" })
+hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("flameshot gui --clipboard"), { description = "Screenshot" })
 
 hl.bind(
 	mainMod .. " + M",

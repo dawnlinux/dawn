@@ -2,6 +2,13 @@
 ---- LOOK AND FEEL ----
 -----------------------
 
+-- Theme Variables
+local activeBorderColor = "rgb(aaacac)"
+local secondaryBorderColor = "rgb(000000)"
+
+local white = "rgb(ffffff)"
+local black = "rgb(000000)"
+
 -- Refer to https://wiki.hypr.land/Configuring/Basics/Variables/
 hl.config({
 	general = {
@@ -11,8 +18,20 @@ hl.config({
 		border_size      = 1,
 
 		col              = {
-			active_border   = "rgb(45403d)",
-			inactive_border = "rgba(45403d99)",
+			active_border = {
+				colors = {
+					black,
+					black,
+					black,
+					white,
+					black,
+					black,
+					black,
+					white,
+				},
+				angle = 25,
+			},
+			inactive_border = black,
 		},
 
 		-- Set to true to enable resizing windows by clicking and dragging on borders and gaps
@@ -28,14 +47,9 @@ hl.config({
 		rounding           = 10,
 		rounding_power     = 2,
 
-		-- Change transparency of focused and unfocused windows
-		active_opacity     = 0.88,
 		inactive_opacity   = 0.88,
+		active_opacity     = 0.88,
 		fullscreen_opacity = 0.88,
-
-		-- active_opacity   = 1,
-		-- inactive_opacity = 1,
-		-- fullscreen_opacity = 1,
 
 		shadow             = {
 			enabled      = true,
@@ -54,6 +68,12 @@ hl.config({
 
 	animations = {
 		enabled = true,
+	},
+
+	group = {
+		col = {
+			border_active = activeBorderColor,
+		},
 	},
 })
 

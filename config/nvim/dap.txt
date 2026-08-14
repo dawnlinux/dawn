@@ -1,0 +1,8 @@
+  - <leader>dc continue / launch
+  - <leader>db toggle breakpoint
+  - <leader>ds step over
+  - <leader>di step into
+  - <leader>do step out
+  - <leader>dr restart
+  - <leader>dt terminate
+  - <leader>du toggle DAP UI

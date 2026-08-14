@@ -80,3 +80,34 @@ hl.window_rule({
 	rounding  = 12,
 	animation = "popin",
 })
+
+-- media player
+hl.window_rule({
+	name      = "float-pavucontrol",
+	match     = { class = "^(org.pulseaudio.pavucontrol)$" },
+	float     = true,
+	size      = { 750, 500 },
+	move      = { "(monitor_w/2)-(window_w/2)", "(monitor_h/2)-(window_h/2)" },
+	rounding  = 12,
+	animation = "popin",
+})
+
+hl.window_rule({
+	name      = "float-mpv",
+	match     = { class = "^(mpv)$" },
+	float     = true,
+	size      = { 1200, 700 },
+	move      = { "(monitor_w/2)-(window_w/2)", "(monitor_h/2)-(window_h/2)" },
+	rounding  = 12,
+	animation = "popin",
+})
+
+hl.window_rule({
+	name      = "float-imv",
+	match     = { class = "^(imv)$" },
+	float     = true,
+	size      = { 1000, 700 },
+	move      = { "(monitor_w/2)-(window_w/2)", "(monitor_h/2)-(window_h/2)" },
+	rounding  = 12,
+	animation = "popin",
+})

@@ -19,6 +19,10 @@ alias nvm "nvim"
 
 alias yt "yt-dlp"
 
+alias fish "source ~/.config/fish/config.fish"
+
+alias play "ffplay"
+
 # Created by `pipx` on 2026-08-05 10:41:00
 set PATH $PATH /home/jhayonline/.local/bin
 
