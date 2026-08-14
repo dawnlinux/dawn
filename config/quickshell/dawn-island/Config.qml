@@ -388,6 +388,13 @@ Singleton {
     property string wallpaperCommand:
         "awww img {} --transition-type random --transition-duration 1.2 --transition-fps 60"
 
+    /// Where the island records the wallpaper it just applied, so the login
+    /// screen can show the same one. dawn-greet runs as the unprivileged
+    /// `greeter` user under greetd and cannot read your home directory or ask
+    /// awww, so a plain file it *can* read is the only way across.
+    /// Empty disables the write. See dawn-greet/README.md.
+    property string wallpaperPointer: "/var/lib/dawn/wallpaper"
+
     // ─────────────────────────────────────────────────────────────────────
     //  Accent / wallpaper integration
     // ─────────────────────────────────────────────────────────────────────

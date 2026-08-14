@@ -1,0 +1,25 @@
+# greetd — the daemon that owns the PAM conversation and starts your session.
+#
+# Installed to /etc/greetd/config.toml by install.sh, which substitutes
+# @LOGIN_USER@ for whoever ran it. Edit this file, not the installed copy, and
+# re-run install.sh.
+#
+# greetd starts exactly one thing: a Hyprland running as the unprivileged
+# `greeter` user, whose only job is to host dawn-greet. See hyprland.conf next
+# to this file.
+
+[terminal]
+# The VT the greeter takes. 1 is greetd's own default and is effectively what
+# SDDM was already using; getty@tty1 is enabled but stays inactive underneath
+# it, exactly as it did before.
+vt = 1
+
+[default_session]
+# DAWN_GREET_USER is who the greeter authenticates as.
+#
+# Without it, $USER inside the greeter is `greeter` — and Auth.qml refuses to
+# authenticate as the greeter account, because doing so fails on every attempt
+# with a PAM message that tells you nothing about why. Better to be told who
+# to log in as than to guess wrong silently.
+command = "env DAWN_GREET_USER=@LOGIN_USER@ Hyprland -c /etc/greetd/hyprland.conf"
+user = "greeter"
