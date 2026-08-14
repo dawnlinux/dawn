@@ -10,7 +10,6 @@
 
 local terminal    = "kitty"
 local fileManager = "nautilus"
-local menu        = os.getenv("HOME") .. "/.config/rofi/type-3/launcher.sh"
 
 local mainMod     = "SUPER"
 
@@ -22,7 +21,12 @@ local mainMod     = "SUPER"
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(terminal), { description = "Open Terminal" })
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager), { description = "Open File Manager" })
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("firefox"), { description = "Open Browser" })
-hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu), { description = "App Launcher" })
+-- The launcher lives in the dawn-island shell, which registers a global
+-- shortcut named "quickshell:launcher" (appid + Config.launcherShortcut).
+-- Dispatching to it rather than exec'ing keeps the key working across shell
+-- restarts, and does nothing at all when the shell isn't running.
+hl.bind(mainMod .. " + SPACE", hl.dsp.global("quickshell:launcher"),
+	{ description = "App Launcher (dawn-island)" })
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/quickshell/dawn-island/launch.sh"),
 	{ description = "Restart Shell (dawn-island)" })
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("swaync-client --toggle-panel"), { description = "Toggle Notification Panel" })
