@@ -32,8 +32,15 @@ end
 local activeBorderColor = palette.activeBorder
 local secondaryBorderColor = palette.inactiveBorder
 
-local white = palette.activeBorder
-local black = palette.shadow
+-- The two ends of the active border's gradient.
+--
+-- `dark` is deliberately NOT palette.shadow: matugen's shadow role is
+-- #000000 in every scheme, and it fills six of the eight gradient stops
+-- below — so using it left three quarters of the border permanently black
+-- and the theme looked like it barely applied. `background` tracks the
+-- palette, so the whole gradient now moves.
+local bright = palette.activeBorder
+local dark = palette.background
 
 -- Refer to https://wiki.hypr.land/Configuring/Basics/Variables/
 hl.config({
@@ -46,18 +53,18 @@ hl.config({
 		col              = {
 			active_border = {
 				colors = {
-					black,
-					black,
-					black,
-					white,
-					black,
-					black,
-					black,
-					white,
+					dark,
+					dark,
+					dark,
+					bright,
+					dark,
+					dark,
+					dark,
+					bright,
 				},
 				angle = 25,
 			},
-			inactive_border = black,
+			inactive_border = secondaryBorderColor,
 		},
 
 		-- Set to true to enable resizing windows by clicking and dragging on borders and gaps
