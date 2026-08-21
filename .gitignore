@@ -21,8 +21,14 @@ target/
 # ── Machine-local overrides ───────────────────────────────────────────────
 #
 # Hardware- and host-specific settings live here so that shared config stays
-# portable. See config/hypr/modules/local.lua.example for the contract.
+# portable. Each has a committed .example next to it describing the contract.
 /config/hypr/modules/local.lua
+/config/fish/local.fish
+
+# fish rewrites this at runtime to store universal variables, and it bakes in
+# absolute paths. Tracking it means churn on every `set -U` and a broken PATH
+# on anyone else's machine. PATH is set explicitly in config.fish instead.
+/config/fish/fish_variables
 
 # ── Personal ──────────────────────────────────────────────────────────────
 #

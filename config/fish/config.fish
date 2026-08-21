@@ -1,34 +1,65 @@
+#############################
+####  DAWN — FISH SHELL  ####
+#############################
+#
+# Shipped defaults only. Anything specific to YOUR machine — personal aliases,
+# project paths, API keys, language version managers — belongs in
+# `local.fish` next to this file, which is gitignored and sourced at the end.
+#
+# Rule of thumb: if it would not make sense on a stranger's fresh Dawn install,
+# it goes in local.fish.
+
 if status is-interactive
-    # Commands to run in interactive sessions can go here
+    # No "Welcome to fish" banner. dawn-greet already introduced itself.
     set fish_greeting
 end
 
-starship init fish | source
+# ── Prompt ────────────────────────────────────────────────────────────────
+#
+# starship, configured by ../starship.toml.
+if type -q starship
+    starship init fish | source
+end
 
-alias ff "fastfetch"
-alias nf "neofetch"
+# ── PATH ──────────────────────────────────────────────────────────────────
+#
+# fish_add_path is idempotent and prepends only if the entry is not already
+# there, so re-sourcing this file cannot grow PATH the way repeated
+# `set -gx PATH ...` lines do. Each is guarded on the directory existing so a
+# machine without cargo or npm does not carry a dead PATH entry.
+for dir in \
+    $HOME/.local/bin \
+    $HOME/.cargo/bin \
+    $HOME/.npm-global/bin \
+    $HOME/.config/composer/vendor/bin
 
+    test -d $dir; and fish_add_path --path $dir
+end
+
+# ── Aliases ───────────────────────────────────────────────────────────────
+
+# System
 alias ll "ls -la"
-
-alias spit "cp ~/software/php/SPIT/spit.php . && touch content.txt"
-
 alias ii "sudo pacman -S"
 alias yy "yay -S"
 
+# Editor. `nvm .` opens the current directory as the project root.
 alias nvm "nvim ."
 
+# Reload this file in place. Note this shadows the `fish` binary; use
+# `command fish` if you want an actual subshell.
+alias fish "source $HOME/.config/fish/config.fish"
+
+# Media
 alias yt "yt-dlp"
-
-alias fish "source ~/.config/fish/config.fish"
-
 alias play "ffplay"
 
-alias bankai "php artisan"
+# Fetch
+alias ff "fastfetch"
 
-# Created by `pipx` on 2026-08-05 10:41:00
-set PATH $PATH /home/jhayonline/.local/bin
-
-set -gx PATH $HOME/.config/composer/vendor/bin $PATH
-set -gx PATH ~/.npm-global/bin $PATH
-set -gx PATH ~/.config/composer/vendor/bin $PATH
-set -gx PATH ~/.config/composer/vendor/bin $PATH
+# ── Machine-local ─────────────────────────────────────────────────────────
+#
+# Sourced last so it can override anything above. See local.fish.example.
+if test -f $HOME/.config/fish/local.fish
+    source $HOME/.config/fish/local.fish
+end

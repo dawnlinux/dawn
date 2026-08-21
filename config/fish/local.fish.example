@@ -1,0 +1,28 @@
+###################################
+####  DAWN — LOCAL FISH CONFIG  ####
+###################################
+#
+# Copy to `local.fish` (same directory) and edit. That filename is gitignored,
+# so nothing here is ever committed — which is what makes it the right place
+# for machine-specific paths, work aliases and secrets.
+#
+#     cp ~/.config/fish/local.fish.example ~/.config/fish/local.fish
+#
+# Sourced at the very end of config.fish, so anything here wins.
+
+# ── Extra PATH entries ────────────────────────────────────────────────────
+#
+# fish_add_path is idempotent; the -d guard keeps dead entries out of PATH.
+# test -d $HOME/.bun/bin; and fish_add_path --path $HOME/.bun/bin
+
+# ── Personal aliases ──────────────────────────────────────────────────────
+#
+# alias gs "git status"
+# alias dc "docker compose"
+
+# ── Secrets ───────────────────────────────────────────────────────────────
+#
+# Prefer a secret manager, but if you must, this is the least-bad place —
+# it never leaves the machine.
+#
+# set -gx SOME_API_KEY "..."
