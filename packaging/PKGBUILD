@@ -75,6 +75,9 @@ _dawn_depends=(
 	starship
 	neovim
 
+	# Colour engine
+	matugen
+
 	# Desktop utilities
 	rofi
 	awww
@@ -111,15 +114,26 @@ _dawn_depends=(
 )
 
 prepare() {
+	local target
+	target="$(rustc -vV | sed -n 's/^host: //p')"
+
 	cd "$(_dawn_srcdir)/tools/typist"
-	cargo fetch --locked --target "$(rustc -vV | sed -n 's/^host: //p')"
+	cargo fetch --locked --target "$target"
+
+	cd "$(_dawn_srcdir)/tools/dawn-theme"
+	cargo fetch --locked --target "$target"
 }
 
 build() {
-	cd "$(_dawn_srcdir)/tools/typist"
 	export RUSTUP_TOOLCHAIN=stable
-	export CARGO_TARGET_DIR="$srcdir/typist-target"
-	cargo build --frozen --release
+
+	# Separate target directories: two independent crates, and sharing one
+	# would let a stale artefact from either leak into the other.
+	cd "$(_dawn_srcdir)/tools/typist"
+	CARGO_TARGET_DIR="$srcdir/typist-target" cargo build --frozen --release
+
+	cd "$(_dawn_srcdir)/tools/dawn-theme"
+	CARGO_TARGET_DIR="$srcdir/dawn-theme-target" cargo build --frozen --release
 }
 
 check() {
@@ -127,6 +141,9 @@ check() {
 	# Fail the build, not the user's install, if the two dependency lists
 	# have drifted apart.
 	./packaging/check-depends.sh
+
+	cd "$(_dawn_srcdir)/tools/dawn-theme"
+	CARGO_TARGET_DIR="$srcdir/dawn-theme-target" cargo test --frozen --release
 }
 
 package_dawn() {
@@ -138,13 +155,15 @@ package_dawn() {
 }
 
 package_dawn-config() {
-	pkgdesc='Dawn desktop configuration and the dawn link manager'
-	arch=('any')
+	pkgdesc='Dawn desktop configuration, the dawn link manager and the colour engine'
+	# NOT 'any' any more: this package now carries the compiled dawn-theme
+	# binary alongside the config tree.
+	arch=('x86_64')
 	# This package ships a Quickshell shell written in QML, so it needs the
 	# runtime that executes it — not just bash for the CLI. Listed directly
 	# rather than leaning on the `dawn` meta-package, because installing
 	# dawn-config on its own has to produce something that actually runs.
-	depends=('bash' 'quickshell' 'qt6-declarative')
+	depends=('bash' 'quickshell' 'qt6-declarative' 'matugen' 'gcc-libs' 'glibc')
 	optdepends=('greetd: for the dawn-greet login screen')
 
 	cd "$(_dawn_srcdir)"
@@ -180,6 +199,12 @@ package_dawn-config() {
 	find "$pkgdir/usr/share/dawn" -depth -type d -empty -delete
 
 	install -Dm755 packaging/dawn "$pkgdir/usr/bin/dawn"
+
+	# The colour engine. Shipped here rather than as its own package: it is
+	# useless without the matugen templates in the config tree, and they are
+	# useless without it.
+	install -Dm755 "$srcdir/dawn-theme-target/release/dawn-theme" \
+		"$pkgdir/usr/bin/dawn-theme"
 	install -Dm644 LICENSE "$pkgdir/usr/share/licenses/dawn-config/LICENSE"
 }
 

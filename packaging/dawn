@@ -226,7 +226,34 @@ seed_all() {
 	# /usr/share would make that fail with a read-only filesystem error.
 	seed_one "$SOURCE/nvim/lazy-lock.json" "$CONFIG_HOME/nvim/lazy-lock.json" "nvim/lazy-lock.json"
 
+	seed_templates
 	seed_wallpapers
+}
+
+# Copy the matugen templates into ~/.config/dawn/templates.
+#
+# matugen's config.toml names them by that path, so they must exist there
+# before dawn-theme can render anything.
+#
+# Copied rather than symlinked for the usual reason: someone tweaking a
+# template must not need write access to /usr/share. The trade is that a
+# template changed upstream does not reach an existing install — which is
+# correct, since an edited template is the user's, and `dawn unlink` plus a
+# fresh `dawn link` picks up the new one.
+seed_templates() {
+	local src dst entry
+	src="$SOURCE/matugen/templates"
+	dst="$OVERRIDES/templates"
+
+	[ -d "$src" ] || return 0
+
+	# matugen writes here and will not create the directory itself.
+	mkdir -p "$dst" "$OVERRIDES/generated"
+
+	for entry in "$src"/*; do
+		[ -f "$entry" ] || continue
+		seed_one "$entry" "$dst/$(basename "$entry")" "templates/$(basename "$entry")"
+	done
 }
 
 # Copy shipped wallpapers into the carousel's directory.

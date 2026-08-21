@@ -32,6 +32,17 @@ starship                    # the fish prompt (config/starship.toml)
 neovim                      # the editor
 
 
+# ── Colour engine ─────────────────────────────────────────────────────────
+
+matugen                     # generates every palette in the desktop from the
+                            # wallpaper or a seed colour. Driven by dawn-theme.
+                            #
+                            # adw-gtk-theme, qt5ct and qt6ct are NOT listed:
+                            # Dawn ships no GTK or Qt templates yet, and a
+                            # package nothing can point at is how a distro
+                            # gets fat. They arrive with their templates.
+
+
 # ── Desktop utilities ─────────────────────────────────────────────────────
 
 rofi                        # the clipboard picker ONLY — the island draws its own launcher

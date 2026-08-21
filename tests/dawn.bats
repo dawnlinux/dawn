@@ -296,3 +296,43 @@ teardown() {
     [ "$status" -eq 0 ]
     [ "$(cat "$HOME/Pictures/Wallpapers/dawn-black.png")" = "devwall" ]
 }
+
+# ── matugen templates ─────────────────────────────────────────────────────
+
+@test "link seeds matugen templates into ~/.config/dawn/templates" {
+    mkdir -p "$DAWN_SHARE/config/matugen/templates"
+    echo 'x {{colors.primary.default.hex}}' > "$DAWN_SHARE/config/matugen/templates/kitty-colors.conf"
+    echo 'y {{colors.surface.default.hex}}' > "$DAWN_SHARE/config/matugen/templates/dawn-colors.json"
+
+    run "$DAWN" link
+    [ "$status" -eq 0 ]
+    [ -f "$XDG_CONFIG_HOME/dawn/templates/kitty-colors.conf" ]
+    [ -f "$XDG_CONFIG_HOME/dawn/templates/dawn-colors.json" ]
+
+    # Copied, not symlinked: matugen reads them, and someone tweaking one
+    # must not need write access to /usr/share.
+    [ ! -L "$XDG_CONFIG_HOME/dawn/templates/kitty-colors.conf" ]
+
+    # The output directory has to exist before matugen writes into it.
+    [ -d "$XDG_CONFIG_HOME/dawn/generated" ]
+}
+
+@test "template seeding never overwrites one you edited" {
+    mkdir -p "$DAWN_SHARE/config/matugen/templates" "$XDG_CONFIG_HOME/dawn/templates"
+    echo 'shipped' > "$DAWN_SHARE/config/matugen/templates/kitty-colors.conf"
+    echo 'MINE'    > "$XDG_CONFIG_HOME/dawn/templates/kitty-colors.conf"
+
+    "$DAWN" link
+    [ "$(cat "$XDG_CONFIG_HOME/dawn/templates/kitty-colors.conf")" = "MINE" ]
+}
+
+@test "templates come from the checkout in dev mode" {
+    mkdir -p "$TESTDIR/checkout/config/kitty" \
+             "$TESTDIR/checkout/config/matugen/templates"
+    echo 'x' > "$TESTDIR/checkout/config/kitty/kitty.conf"
+    echo 'devtemplate' > "$TESTDIR/checkout/config/matugen/templates/dawn-colors.json"
+
+    run "$DAWN" dev "$TESTDIR/checkout"
+    [ "$status" -eq 0 ]
+    [ "$(cat "$XDG_CONFIG_HOME/dawn/templates/dawn-colors.json")" = "devtemplate" ]
+}
