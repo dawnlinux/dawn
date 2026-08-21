@@ -148,9 +148,13 @@ three strategies, declared per application:
 
 | Strategy | Behaviour | Applies to |
 |---|---|---|
-| `DIR` | symlink the whole directory | `hypr`, `kitty`, `rofi` |
+| `DIR` | symlink the entry wholesale | `hypr`, `kitty`, `rofi`, `starship.toml` |
 | `LINK` | create a real directory; symlink each listed entry into it | `fish`, `nvim`, `quickshell` |
 | `SEED` | copy once if absent; never overwrite | `lazy-lock.json`, `~/.config/dawn/local.*` |
+
+`DIR` covers files as well as directories — `starship.toml` is a single file
+at the root of the config tree, and `ln -sfn` treats both identically. The
+strategy is "symlink this entry as a whole", not "symlink this directory".
 
 `LINK` is driven by an explicit per-application entry list held in the CLI, not
 by globbing the source directory. Globbing would silently start linking any new
