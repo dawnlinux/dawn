@@ -27,13 +27,32 @@ Copied verbatim from the spec. Every task's requirements implicitly include thes
 
 ---
 
-## Two deviations from the spec, and why
+## Three deviations from the spec, and why
 
 **1. `Colors.qml`, not a generated `Theme.qml`.** The spec says "`Theme.qml` becomes generated". Inspection shows `Theme.qml` holds **17 colour properties and 23 non-colour ones** — `spacingXs`, `radiusLg`, `artSize`, `shadowRadius`, `trackThickness` and so on. Generating the whole file would turn every hand-tuned dimension into machine output.
 
 Colours move into a new `theme/Colors.qml` singleton — matching the existing `Anim.qml` / `Glyphs.qml` / `Typography.qml` pattern in that directory — and only that file is generated. `Theme.qml` keeps its sizes and re-exports the colours so no call site changes.
 
-**2. `border` and `highlight` keep their alpha.** They are currently `Qt.rgba(1, 1, 1, 0.06)` and `Qt.rgba(1, 1, 1, 0.10)` — hairline overlays, not solid colours. Mapping them straight to `outline_variant` (`#44474f`) would replace a hairline with a visible border. They are instead tinted by the palette while keeping their alpha, via QML's `.r`/`.g`/`.b` colour components.
+**2. The palette is generated as JSON, not as QML.** The spec and the first
+draft of this plan had matugen render `Colors.qml` directly. That cannot work
+in package mode: the island's `theme/` directory lives at
+`/usr/share/dawn/config/quickshell/dawn-island/theme/`, which is root-owned and
+read-only, and `~/.config/quickshell/dawn-island` is a symlink straight into
+it. There is nowhere writable for matugen to put a generated QML file that
+Quickshell would still resolve as part of the `qs.theme` module. Generating
+into the checkout instead would leave `git status` permanently dirty and commit
+a machine-specific palette.
+
+So matugen renders `~/.config/dawn/generated/colors.json`, and `Colors.qml`
+ships as a normal static file that reads it through `FileView` + `JsonAdapter`.
+
+Verified working, including live reload: with `watchChanges: true` and
+`onFileChanged: reload()`, rewriting the JSON repaints the shell immediately —
+no regeneration of QML, no restart. The property defaults in `Colors.qml`
+double as the fallback palette when the file is absent, which is exactly what a
+fresh install needs.
+
+**3. `border` and `highlight` keep their alpha.** They are currently `Qt.rgba(1, 1, 1, 0.06)` and `Qt.rgba(1, 1, 1, 0.10)` — hairline overlays, not solid colours. Mapping them straight to `outline_variant` (`#44474f`) would replace a hairline with a visible border. They are instead tinted by the palette while keeping their alpha, via QML's `.r`/`.g`/`.b` colour components.
 
 ---
 
