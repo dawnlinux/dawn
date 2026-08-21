@@ -348,8 +348,15 @@ cmd_unlink() {
 
 	step "Restoring backups"
 
-	local latest item
-	latest="$(find "$BACKUP_ROOT" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | sort | tail -1)"
+	local latest="" item
+
+	# Guarded on the directory existing rather than relying on redirection:
+	# `find` on a missing path exits non-zero, and under `set -euo pipefail`
+	# that aborts the whole command before it can report "no backups".
+	# Silencing stderr hides the message, not the exit status.
+	if [ -d "$BACKUP_ROOT" ]; then
+		latest="$(find "$BACKUP_ROOT" -maxdepth 1 -mindepth 1 -type d | sort | tail -1)"
+	fi
 
 	if [ -z "$latest" ]; then
 		skip "no backups in $BACKUP_ROOT"
