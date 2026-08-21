@@ -2,13 +2,16 @@
 ####  DAWN — LOCAL FISH CONFIG  ####
 ###################################
 #
-# Copy to `local.fish` (same directory) and edit. That filename is gitignored,
-# so nothing here is ever committed — which is what makes it the right place
-# for machine-specific paths, work aliases and secrets.
+# Copy this file to `~/.config/dawn/local.fish` and edit it:
 #
-#     cp ~/.config/fish/local.fish.example ~/.config/fish/local.fish
+#     mkdir -p ~/.config/dawn
+#     cp /usr/share/dawn/examples/local.fish ~/.config/dawn/local.fish
 #
-# Sourced at the very end of config.fish, so anything here wins.
+# `dawn link` does this for you on a fresh install, and never overwrites an
+# existing file. Sourced at the very end of config.fish, so anything here wins.
+#
+# It lives outside ~/.config/fish because Dawn's shipped config is owned by
+# pacman and read-only — an override cannot sit beside what it overrides.
 
 # ── Extra PATH entries ────────────────────────────────────────────────────
 #

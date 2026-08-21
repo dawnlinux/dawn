@@ -1,16 +1,17 @@
 --[[ =========================================================================
   DAWN — MACHINE-LOCAL HYPRLAND OVERRIDES
 
-  Copy this file to `local.lua` in the same directory and edit it:
+  Copy this file to `~/.config/dawn/local.lua` and edit it:
 
-      cp ~/.config/hypr/modules/local.lua.example ~/.config/hypr/modules/local.lua
+      mkdir -p ~/.config/dawn
+      cp /usr/share/dawn/examples/local.lua ~/.config/dawn/local.lua
 
-  `local.lua` is gitignored, so nothing you put here is ever committed and
-  `git pull` will never conflict with it. That is the whole point: shared Dawn
-  config stays portable, and everything true of only YOUR machine lives here.
+  `dawn link` does this for you on a fresh install, and never overwrites an
+  existing file. ~/.config/dawn/ sits outside every symlink Dawn creates, so
+  pacman never touches it and `git pull` can never conflict with it.
 
-  It is required LAST by hyprland.lua, so anything here overrides every other
-  module. Same `hl.*` API — this is a normal Hyprland Lua module.
+  It is loaded LAST by hyprland.lua, so anything here overrides every other
+  module. Same `hl.*` API — this is a normal Hyprland Lua chunk.
 
   If this file exists but has an error, Hyprland logs a line starting with
   `dawn:`. Find it with:

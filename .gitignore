@@ -20,10 +20,8 @@ target/
 
 # ── Machine-local overrides ───────────────────────────────────────────────
 #
-# Hardware- and host-specific settings live here so that shared config stays
-# portable. Each has a committed .example next to it describing the contract.
-/config/hypr/modules/local.lua
-/config/fish/local.fish
+# Overrides now live in ~/.config/dawn/, outside this repository entirely, so
+# there is nothing here to ignore. Templates are committed under examples/.
 
 # fish rewrites this at runtime to store universal variables, and it bakes in
 # absolute paths. Tracking it means churn on every `set -U` and a broken PATH

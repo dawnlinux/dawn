@@ -59,7 +59,9 @@ alias ff "fastfetch"
 
 # ── Machine-local ─────────────────────────────────────────────────────────
 #
-# Sourced last so it can override anything above. See local.fish.example.
-if test -f $HOME/.config/fish/local.fish
-    source $HOME/.config/fish/local.fish
+# Sourced last so it can override anything above. Lives in ~/.config/dawn/
+# rather than beside this file because Dawn's shipped config is owned by
+# pacman and read-only. See /usr/share/dawn/examples/local.fish.
+if test -f $HOME/.config/dawn/local.fish
+    source $HOME/.config/dawn/local.fish
 end
