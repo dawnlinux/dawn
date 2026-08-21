@@ -1,10 +1,14 @@
 /*
  * Dawn palette for rofi.
  *
- * Overwritten by `dawn-theme <name>` when a theme is applied; the values here
- * are the built-in "dawn" monochrome palette and match
- * config/quickshell/dawn-island/theme/Theme.qml. Keep the two in sync — the
- * clipboard picker sits directly under the island, so a mismatch is visible.
+ * These are the Dawn colours and they match
+ * config/quickshell/dawn-island/theme/Theme.qml and
+ * config/kitty/colors/colors.conf. Dawn ships one palette on purpose — the
+ * accent comes from your wallpaper at runtime (dawn-island/services/Accent.qml),
+ * not from swapping whole colour schemes.
+ *
+ * Change a colour here and change it in Theme.qml too; the clipboard picker
+ * sits directly under the island, so a mismatch is visible.
  */
 * {
     background:       #000000;

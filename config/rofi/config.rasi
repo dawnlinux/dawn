@@ -10,8 +10,7 @@
  * `rofi -dmenu` reads ~/.config/rofi/config.rasi with no -theme flag, which is
  * why this file has that exact name and why there is only one of them.
  *
- * Colours live in colors.rasi so `dawn-theme` can rewrite them without
- * touching the layout below.
+ * Colours live in colors.rasi, kept in sync with the island's Theme.qml.
  */
 
 @import "colors.rasi"
