@@ -251,15 +251,34 @@ Expected: `luac`/`fish -n` silent, `hyprctl reload` prints `ok`, the bind count 
 
 - [ ] **Step 8: Verify a BROKEN override is reported**
 
+Hyprland's Lua config has no `hl.notify`, and `print()` from it reaches
+neither `hyprland.log` nor `hyprctl rollinglog` — both verified by probe. So
+the loader records failures to `~/.config/dawn/last-error` and additionally
+fires `notify-send`. The file is the reliable channel; the notification is
+best-effort, because at boot no notification daemon is running yet.
+
 ```bash
+# syntax error branch
 cp ~/.config/dawn/local.lua /tmp/local.lua.bak
 echo 'this is not valid lua ===' >> ~/.config/dawn/local.lua
-hyprctl reload
-hyprctl rollinglog | grep '^dawn:' | tail -1
+hyprctl reload >/dev/null
+cat ~/.config/dawn/last-error
+
+# runtime error branch
 mv /tmp/local.lua.bak ~/.config/dawn/local.lua
-hyprctl reload
+cp ~/.config/dawn/local.lua /tmp/local.lua.bak
+echo 'error("deliberate runtime failure")' >> ~/.config/dawn/local.lua
+hyprctl reload >/dev/null
+cat ~/.config/dawn/last-error
+
+# restore; the error file must self-clear
+mv /tmp/local.lua.bak ~/.config/dawn/local.lua
+hyprctl reload >/dev/null
+ls ~/.config/dawn/last-error
 ```
-Expected: a `dawn: ~/.config/dawn/local.lua could not be read -- ...` line appears, then the restore reloads cleanly.
+Expected: `... could not be read: <file>:N: syntax error near 'is'`, then
+`... failed: <file>:N: deliberate runtime failure`, then `No such file` once
+the healthy config is restored.
 
 - [ ] **Step 9: Commit**
 
@@ -965,6 +984,13 @@ cmd_status() {
 
 	printf '\n  mode:   \033[1;37m%s\033[0m\n' "$mode"
 	printf '  source: %s\n\n' "$SOURCE"
+
+	# hyprland.lua records a broken local.lua here, because it has no other
+	# working channel — no hl.notify, and print() reaches no log. Surfacing
+	# it is the whole reason the file exists.
+	if [ -s "$OVERRIDES/last-error" ]; then
+		printf '   \033[31m✗\033[0m local.lua  %s\n\n' "$(cat "$OVERRIDES/last-error")"
+	fi
 
 	# Report every managed entry, so "I edited the repo and nothing changed"
 	# always has a visible cause.
