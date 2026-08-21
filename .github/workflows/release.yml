@@ -1,0 +1,123 @@
+# Build, sign and publish the Dawn packages.
+#
+# Triggered by pushing a tag, because pkgver derives from the tag — tagging is
+# the only release action:
+#
+#     git tag v1.0.1 && git push origin v1.0.1
+#
+# Secrets required on this repository:
+#
+#   GPG_PRIVATE_KEY   base64 of `gpg --armor --export-secret-keys <KEY>`
+#   REPO_PUSH_TOKEN   a token with write access to dawnlinux/repo
+#
+# The heavy lifting lives in packaging/release.sh rather than in YAML, so a
+# release can be reproduced and debugged locally with the same code path.
+
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:base-devel
+
+    steps:
+      - name: Install build tooling
+        run: |
+          pacman -Syu --noconfirm --needed \
+            git rust bats shellcheck namcap sudo openssh
+
+      # makepkg refuses to run as root, so the build needs an ordinary user.
+      - name: Create the build user
+        run: |
+          useradd -m builder
+          echo 'builder ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/builder
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check the tag matches pkgver
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkgver="$(grep -oP '^pkgver=\K.*' packaging/PKGBUILD)"
+          if [ "$tag" != "$pkgver" ]; then
+            echo "tag $GITHUB_REF_NAME does not match pkgver=$pkgver" >&2
+            echo "Bump pkgver in packaging/PKGBUILD before tagging." >&2
+            exit 1
+          fi
+          echo "tag and pkgver agree: $pkgver"
+
+      - name: Test
+        run: |
+          chown -R builder:builder .
+          sudo -u builder bats tests/dawn.bats tests/depends.bats
+          sudo -u builder shellcheck \
+            packaging/dawn packaging/check-depends.sh packaging/release.sh install.sh
+
+      - name: Import the signing key
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          # Imported for the build user, because that is who signs.
+          echo "$GPG_PRIVATE_KEY" | base64 -d | sudo -u builder gpg --batch --import
+          sudo -u builder gpg --list-secret-keys --with-colons \
+            | grep -q '^sec' || { echo "no secret key imported" >&2; exit 1; }
+
+      - name: Build, sign and assemble the repository
+        run: sudo -u builder ./packaging/release.sh "$PWD/out"
+
+      - name: Lint the packages
+        run: |
+          cd packaging
+          for pkg in ./*.pkg.tar.zst; do
+            echo "--- $pkg"
+            namcap "$pkg" | grep ' E: ' && { echo "namcap errors" >&2; exit 1; } || true
+          done
+
+      # Two consumers. GitHub Pages below, and the installer ISO, which bakes
+      # an OFFLINE pacman repository onto the image so `pacstrap` never touches
+      # the network — that is what makes an ISO install in under two minutes.
+      # Publishing the artifact keeps the ISO build from rebuilding everything.
+      - name: Publish packages as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: |
+            out/x86_64/*.pkg.tar.zst
+            out/x86_64/*.sig
+          retention-days: 90
+
+      - name: Check out the package repository
+        uses: actions/checkout@v4
+        with:
+          repository: dawnlinux/repo
+          token: ${{ secrets.REPO_PUSH_TOKEN }}
+          path: pacman-repo
+
+      - name: Update and push
+        run: |
+          # .nojekyll stops GitHub Pages applying Jekyll, which would ignore
+          # files and directories beginning with an underscore and can mangle
+          # binary assets.
+          touch pacman-repo/.nojekyll
+
+          mkdir -p pacman-repo/x86_64
+          cp out/x86_64/* pacman-repo/x86_64/
+          cp out/dawn.gpg pacman-repo/dawn.gpg
+
+          cd pacman-repo
+          git config user.name  'dawn-release'
+          git config user.email 'themarathondev7@gmail.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo "nothing changed"
+            exit 0
+          fi
+          git commit -m "release ${GITHUB_REF_NAME}"
+          git push
