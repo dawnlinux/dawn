@@ -10,15 +10,10 @@
 
 hl.on("hyprland.start", function()
 	-- dawn-island: the shell. Owns the top edge — status bar, app launcher,
-	-- media controls, the session menu and the wallpaper carousel are all in
-	-- here, so this single process replaces what would otherwise be a bar, a
-	-- launcher and a power menu.
+	-- media controls, notifications, the session menu and the wallpaper
+	-- carousel are all in here, so this single process replaces what would
+	-- otherwise be a bar, a launcher, a notification daemon and a power menu.
 	hl.exec_cmd("qs -p ~/.config/quickshell/dawn-island/shell.qml")
-
-	-- swaync owns org.freedesktop.Notifications and draws the notification
-	-- popups and centre. Only one process can own that bus name, so if the
-	-- island ever serves notifications itself, this line goes.
-	hl.exec_cmd("swaync")
 
 	-- awww-daemon: the wallpaper daemon. The island's wallpaper carousel
 	-- talks to it, and it is what publishes the current wallpaper to the

@@ -302,25 +302,28 @@ working.
 
 ## Notifications
 
-Only one process can own `org.freedesktop.Notifications`. **swaync currently
-owns it**, so the island receives nothing and logs:
+The island **is** the notification daemon. `services/Notifs.qml` claims
+`org.freedesktop.Notifications` on the session bus, `NotificationView.qml`
+draws the banners, and `NotifCenterView.qml` is the persistent centre —
+Super+N, or click the badge on the island.
+
+Only one process can own that bus name, so **no other notification daemon may
+be running**. swaync, dunst and mako all win the name if they start first, and
+when that happens the island logs:
 
 ```
 Could not register notification server ... presumably because one is already registered.
 ```
 
-This is expected, not a bug. To hand notifications to the island:
+and then silently receives nothing. Dawn does not install any of them; if you
+add one yourself, that is the trade you are making.
 
-1. Comment out `hl.exec_cmd("swaync")` in `~/.config/hypr/modules/autostart.lua`
-2. `pkill swaync`
+Quickshell claims the name automatically within a second or two and retries
+whenever the current owner disappears, so stopping a competing daemon is enough
+— you do not need to restart the shell.
 
-Quickshell claims the name automatically within a second or two — it retries
-whenever the current owner disappears, so you do not need to restart the shell.
-Notification banners were verified working this way; swaync was then restored.
-
-Keep in mind the island shows a notification for a few seconds and keeps a
-short in-memory history, but it is not a notification _centre_: there is no
-persistent panel listing everything you missed. If you want that, keep swaync.
+Set `Config.enableNotifications = false` to opt out entirely and free the bus
+name for a daemon of your choosing.
 
 ---
 

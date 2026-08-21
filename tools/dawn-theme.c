@@ -295,7 +295,6 @@ int apply_theme(const char *theme_name) {
       {"", "hyprland.conf", "/hypr", "hyprland.conf", false},
       {"", "kitty.conf", "/kitty/colors", "colors.conf", false},
       {"", "rofi.rasi", "/rofi", "colors.rasi", false},
-      {"", "swaync.css", "/swaync/colors", "colors.css", false},
   };
 
   // Process each component
@@ -426,7 +425,6 @@ int apply_theme(const char *theme_name) {
   // Reload services
   printf("Reloading services...\n");
   (void)!system("hyprctl reload 2>/dev/null");
-  (void)!system("pkill -SIGUSR2 swaync 2>/dev/null");
   printf("✓ Services reloaded\n");
 
   return 0;
