@@ -39,7 +39,7 @@ set -euo pipefail
 # Set by packaging/release.sh at tag time. Until the first signed release
 # exists this is the placeholder, and import_key refuses to continue rather
 # than trusting an unknown key.
-DAWN_KEY_ID='REPLACE_WITH_FINGERPRINT'
+DAWN_KEY_ID='C36BACF174290B6ED5456879BCB1F6ACA2DD7A59'
 DAWN_KEY_URL='https://dawnlinux.github.io/repo/dawn.gpg'
 # $arch is expanded by PACMAN, not by bash — it must reach pacman.conf
 # literally, so the single quotes here are deliberate and required.
