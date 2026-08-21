@@ -51,7 +51,7 @@ Item {
     readonly property bool wantsKeyboard:
         viewState === "launcher" || viewState === "status"
         || viewState === "wallpaper" || viewState === "notifcenter"
-        || viewState === "power"
+        || viewState === "power" || viewState === "keybinds"
 
     property bool hoverExpanded: false
     property bool pinned: false

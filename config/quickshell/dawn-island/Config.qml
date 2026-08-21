@@ -108,6 +108,7 @@ Singleton {
     property int keybindsHeaderHeight: 34
     property int keybindsRowHeight: 32
     property int keybindsMaxRows: 12
+    property int keybindsFooterHeight: 26
     /// Ctrl+D / Ctrl+U step by this many rows.
     property int keybindsPageSize: 6
     /// Fixed column for the key chord so every description starts aligned.

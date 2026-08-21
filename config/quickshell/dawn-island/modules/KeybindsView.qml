@@ -19,8 +19,21 @@ import qs.theme
 Item {
     id: root
 
+    /// How many rows are on screen. Everything else is measured from this.
+    ///
+    /// Computed here rather than read back out of the ListView: the island
+    /// sizes itself from this view's implicitHeight, so a height that depends
+    /// on a child which depends on the parent is a layout loop.
+    readonly property int visibleRows:
+        Math.min(Keybinds.binds.length, Config.keybindsMaxRows)
+
     implicitWidth: Config.keybindsWidth
-    implicitHeight: header.height + divider.height + list.height + Theme.spacingSm * 3
+    implicitHeight: Config.keybindsHeaderHeight
+                    + 1                                   // the divider
+                    + Theme.spacingSm                     // above the list
+                    + visibleRows * Config.keybindsRowHeight
+                    + Config.keybindsFooterHeight
+                    + Theme.spacingSm                     // below the footer
 
     focus: true
     Component.onCompleted: forceActiveFocus()
@@ -32,7 +45,6 @@ Item {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: Theme.spacingSm
         height: Config.keybindsHeaderHeight
 
         Label {
@@ -83,7 +95,7 @@ Item {
         anchors.leftMargin: Theme.spacingSm
         anchors.rightMargin: Theme.spacingSm
 
-        height: Math.min(Keybinds.binds.length, Config.keybindsMaxRows) * Config.keybindsRowHeight
+        height: root.visibleRows * Config.keybindsRowHeight
 
         clip: true
         model: Keybinds.binds
@@ -254,13 +266,18 @@ Item {
 
     // ── Footer ────────────────────────────────────────────────────────────
 
-    Label {
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 2
-        text: "j / k  move     g / G  ends     esc  close"
-        color: Theme.textQuaternary
-        font.pixelSize: Typography.caption
-        visible: Keybinds.binds.length > 0
+    Item {
+        anchors.top: list.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: Config.keybindsFooterHeight
+
+        Label {
+            anchors.centerIn: parent
+            text: "j / k  move     g / G  ends     esc  close"
+            color: Theme.textQuaternary
+            font.pixelSize: Typography.caption
+            visible: Keybinds.binds.length > 0
+        }
     }
 }
