@@ -225,6 +225,41 @@ seed_all() {
 	# lazy.nvim rewrites this on every :Lazy update. A symlink into
 	# /usr/share would make that fail with a read-only filesystem error.
 	seed_one "$SOURCE/nvim/lazy-lock.json" "$CONFIG_HOME/nvim/lazy-lock.json" "nvim/lazy-lock.json"
+
+	seed_wallpapers
+}
+
+# Copy shipped wallpapers into the carousel's directory.
+#
+# Seeded rather than symlinked because this is the user's own wallpaper folder
+# — they add, rename and delete things in it, and a tree of read-only symlinks
+# into /usr/share is not a folder you can do that to.
+#
+# Matched by extension against `wallpaperExtensions` in the island's
+# Config.qml. The directory also holds a README, and a README is not a
+# wallpaper.
+seed_wallpapers() {
+	local src dst count=0 wp
+	src="$(dirname "$SOURCE")/assets/wallpapers"
+	dst="$HOME/Pictures/Wallpapers"
+
+	[ -d "$src" ] || return 0
+	mkdir -p "$dst"
+
+	while IFS= read -r wp; do
+		[ -e "$dst/$(basename "$wp")" ] && continue
+		cp "$wp" "$dst/"
+		chmod u+w "$dst/$(basename "$wp")"
+		count=$((count + 1))
+	done < <(find "$src" -maxdepth 1 -type f \
+		\( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' \
+		   -o -iname '*.webp' -o -iname '*.gif' -o -iname '*.bmp' \))
+
+	if [ "$count" -gt 0 ]; then
+		ok "$count wallpaper(s) -> $dst"
+	else
+		skip "wallpapers (already yours)"
+	fi
 }
 
 # ── Source resolution ─────────────────────────────────────────────────────

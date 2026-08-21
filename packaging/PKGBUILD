@@ -161,6 +161,12 @@ package_dawn-config() {
 	# Seed sources for ~/.config/dawn.
 	cp -a examples "$pkgdir/usr/share/dawn/examples"
 
+	# Shipped wallpapers, seeded into ~/Pictures/Wallpapers by `dawn link`.
+	# Kept under assets/ so the CLI can resolve them the same way in both
+	# modes: <source>/../assets/wallpapers, which is /usr/share/dawn/assets
+	# when packaged and <checkout>/assets when developing.
+	cp -a assets "$pkgdir/usr/share/dawn/assets"
+
 	# Everything under /usr/share is read-only to the user by design; the CLI
 	# chmods the copies it seeds into their home.
 	find "$pkgdir/usr/share/dawn" -type d -exec chmod 755 {} +

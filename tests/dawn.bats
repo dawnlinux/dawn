@@ -260,3 +260,39 @@ teardown() {
     [ "$status" -eq 0 ]
     [ "$(cat "$XDG_CONFIG_HOME/dawn/local.lua")" = "-- dev example" ]
 }
+
+# ── wallpapers ────────────────────────────────────────────────────────────
+
+@test "link seeds shipped wallpapers into ~/Pictures/Wallpapers" {
+    mkdir -p "$DAWN_SHARE/assets/wallpapers"
+    printf 'x' > "$DAWN_SHARE/assets/wallpapers/dawn-black.png"
+    printf 'y' > "$DAWN_SHARE/assets/wallpapers/dawn-white.png"
+    printf 'z' > "$DAWN_SHARE/assets/wallpapers/README.md"
+
+    run "$DAWN" link
+    [ "$status" -eq 0 ]
+    [ -f "$HOME/Pictures/Wallpapers/dawn-black.png" ]
+    [ -f "$HOME/Pictures/Wallpapers/dawn-white.png" ]
+
+    # A README is documentation, not a wallpaper.
+    [ ! -e "$HOME/Pictures/Wallpapers/README.md" ]
+}
+
+@test "wallpaper seeding never overwrites one you edited" {
+    mkdir -p "$DAWN_SHARE/assets/wallpapers" "$HOME/Pictures/Wallpapers"
+    printf 'shipped' > "$DAWN_SHARE/assets/wallpapers/dawn-black.png"
+    printf 'MINE'    > "$HOME/Pictures/Wallpapers/dawn-black.png"
+
+    "$DAWN" link
+    [ "$(cat "$HOME/Pictures/Wallpapers/dawn-black.png")" = "MINE" ]
+}
+
+@test "wallpapers come from the checkout in dev mode" {
+    mkdir -p "$TESTDIR/checkout/config/kitty" "$TESTDIR/checkout/assets/wallpapers"
+    echo 'x' > "$TESTDIR/checkout/config/kitty/kitty.conf"
+    printf 'devwall' > "$TESTDIR/checkout/assets/wallpapers/dawn-black.png"
+
+    run "$DAWN" dev "$TESTDIR/checkout"
+    [ "$status" -eq 0 ]
+    [ "$(cat "$HOME/Pictures/Wallpapers/dawn-black.png")" = "devwall" ]
+}
