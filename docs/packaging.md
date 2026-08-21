@@ -28,7 +28,7 @@ everything else.
 | Package | Arch | Contents |
 |---|---|---|
 | `dawn` | any | meta — depends on `dawn-config` plus the 31 runtime packages |
-| `dawn-config` | any | `/usr/share/dawn/`, `/usr/bin/dawn` |
+| `dawn-config` | x86_64 | `/usr/share/dawn/`, `/usr/bin/dawn`, `/usr/bin/dawn-theme` |
 | `dawn-typist` | x86_64 | `/usr/bin/typist` |
 
 All three come from one split `PKGBUILD` (`pkgbase=dawn`), so a single build
@@ -51,7 +51,8 @@ release pipeline.
 This is the core mechanism, and the part with the most hidden complexity.
 
 `dawn-config` installs the config tree to `/usr/share/dawn/config`, owned by
-pacman and read-only to you. `/usr/bin/dawn` then symlinks it into
+pacman and read-only to you. It also carries `/usr/bin/dawn-theme`, the colour
+engine — which is why the package is `x86_64` rather than `any`. `/usr/bin/dawn` then symlinks it into
 `~/.config`. Because those are symlinks, `pacman -Syu` updates the running
 desktop instantly — no merge step, no migration scripts, no per-release upgrade
 logic.
@@ -85,7 +86,12 @@ declares how it is linked:
 |---|---|---|
 | `DIR` | symlink the entry wholesale | `hypr`, `kitty`, `rofi`, `starship.toml` |
 | `LINK` | real directory; symlink only the entries Dawn owns | `fish`, `nvim`, `quickshell` |
-| `SEED` | copy once if absent, never overwrite | `local.lua`, `local.fish`, `lazy-lock.json` |
+| `SEED` | copy once if absent, never overwrite | `local.lua`, `local.fish`, `lazy-lock.json`, the matugen templates, the shipped wallpapers |
+
+The `LINK` entry lists are explicit, never globbed — so a new top-level
+directory in one of those configs does not reach `~/.config` until it is added
+to `ENTRIES` in `packaging/dawn`. That is deliberate (it is what stops Dawn
+linking a file an application expects to own) but it is a step to remember.
 
 `DIR` covers files as well as directories — `starship.toml` is a single file,
 and `ln -sfn` treats both identically. The strategy is "symlink this entry as a
@@ -298,8 +304,9 @@ exactly three.
 
 | Layer | How | Status |
 |---|---|---|
-| Link strategies | `tests/dawn.bats` against a fake `$XDG_CONFIG_HOME` | 23 passing |
+| Link strategies | `tests/dawn.bats` against a fake `$XDG_CONFIG_HOME` | 29 passing |
 | Manifest drift | `tests/depends.bats` | 3 passing |
+| Colour engine | `cargo test` in `tools/dawn-theme`, run by the PKGBUILD's `check()` | 24 passing |
 | Shell lint | `shellcheck` on all four scripts | clean |
 | Package lint | `namcap` on all three packages | 0 errors |
 | Repository | build, sign, `repo-add`, verify db signature | verified |

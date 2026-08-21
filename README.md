@@ -178,10 +178,17 @@ Keybindings live in
 wallpaper switcher. Fewer processes, one design language, one place to change
 a colour.
 
-**One palette.** Dawn does not ship a theme switcher. The interface is
-monochrome and the *colour* comes from your wallpaper — `Accent.qml` samples
-the image you picked and everything follows. A wallpaper you like is a better
-theme than a theme you picked from a list.
+**One source, every application.** Dawn ships no hand-maintained themes. A
+wallpaper — or a seed colour — generates a full Material You palette, and the
+shell, terminal, launcher, compositor and editor all render from it. Change the
+wallpaper and the desktop follows, live:
+
+```sh
+dawn-theme wallpaper ~/Pictures/Wallpapers/lantern-line.png
+dawn-theme scheme vibrant
+```
+
+See [`docs/theming.md`](docs/theming.md).
 
 **Rofi draws one thing.** The clipboard picker, because `rofi -dmenu` is still
 the fastest way to build one. It is not the app launcher; the island draws its
