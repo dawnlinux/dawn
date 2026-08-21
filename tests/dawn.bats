@@ -129,3 +129,39 @@ teardown() {
     [ -L "$XDG_CONFIG_HOME/quickshell/dawn-island" ]
     [ ! -e "$XDG_CONFIG_HOME/quickshell/dawn-greet" ]
 }
+
+# ── SEED strategy ─────────────────────────────────────────────────────────
+
+@test "seed copies the override examples on a fresh install" {
+    echo '-- lua example'   > "$DAWN_SHARE/examples/local.lua"
+    echo '# fish example'   > "$DAWN_SHARE/examples/local.fish"
+
+    run "$DAWN" link
+    [ "$status" -eq 0 ]
+    [ -f "$XDG_CONFIG_HOME/dawn/local.lua" ]
+    [ -f "$XDG_CONFIG_HOME/dawn/local.fish" ]
+    [ ! -L "$XDG_CONFIG_HOME/dawn/local.lua" ]
+}
+
+@test "seed never overwrites an existing override" {
+    echo '-- lua example' > "$DAWN_SHARE/examples/local.lua"
+    mkdir -p "$XDG_CONFIG_HOME/dawn"
+    echo '-- MINE' > "$XDG_CONFIG_HOME/dawn/local.lua"
+
+    "$DAWN" link
+    [ "$(cat "$XDG_CONFIG_HOME/dawn/local.lua")" = "-- MINE" ]
+}
+
+@test "lazy-lock.json is seeded as a real file, not a symlink" {
+    mkdir -p "$DAWN_SHARE/config/nvim"
+    echo 'return {}'   > "$DAWN_SHARE/config/nvim/init.lua"
+    echo '{"a":"b"}'   > "$DAWN_SHARE/config/nvim/lazy-lock.json"
+
+    run "$DAWN" link
+    [ -f "$XDG_CONFIG_HOME/nvim/lazy-lock.json" ]
+    [ ! -L "$XDG_CONFIG_HOME/nvim/lazy-lock.json" ]
+
+    # It must be writable — this is the entire reason it is seeded.
+    echo '{"c":"d"}' > "$XDG_CONFIG_HOME/nvim/lazy-lock.json"
+    [ "$(cat "$XDG_CONFIG_HOME/nvim/lazy-lock.json")" = '{"c":"d"}' ]
+}

@@ -180,9 +180,40 @@ strategy_link() {
 	ok "$name ($linked entries)"
 }
 
-# Filled in by a later task; defined here so `apply` is complete from the
-# start and adding a strategy never means editing the dispatch loop.
-seed_all() { :; }
+# Copy $1 to $2 if and only if $2 does not exist.
+#
+# SEED is for files Dawn ships an initial version of but the user or an
+# application then OWNS. Symlinking them would point a writer at a read-only
+# path; copying every time would destroy the user's edits. Copy-once is the
+# only behaviour that is correct for both.
+seed_one() {
+	local src="$1" dst="$2" label="$3"
+
+	[ -e "$src" ] || return 0
+
+	if [ -e "$dst" ]; then
+		skip "$label (already yours)"
+		return 0
+	fi
+
+	mkdir -p "$(dirname "$dst")"
+	cp "$src" "$dst"
+	chmod u+w "$dst"    # the source under /usr/share is mode 644 root-owned
+	ok "$label (seeded)"
+}
+
+seed_all() {
+	step "Seeding user-owned files"
+
+	# The machine-local overrides. ~/.config/dawn/ is outside every symlink
+	# Dawn creates, so pacman never touches what lands here.
+	seed_one "$DAWN_SHARE/examples/local.lua"  "$OVERRIDES/local.lua"  "dawn/local.lua"
+	seed_one "$DAWN_SHARE/examples/local.fish" "$OVERRIDES/local.fish" "dawn/local.fish"
+
+	# lazy.nvim rewrites this on every :Lazy update. A symlink into
+	# /usr/share would make that fail with a read-only filesystem error.
+	seed_one "$SOURCE/nvim/lazy-lock.json" "$CONFIG_HOME/nvim/lazy-lock.json" "nvim/lazy-lock.json"
+}
 
 # ── Source resolution ─────────────────────────────────────────────────────
 
