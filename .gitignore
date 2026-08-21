@@ -9,11 +9,6 @@ nvim.log
 
 # ── Build output ──────────────────────────────────────────────────────────
 #
-# `make -C tools` produces this. Committing a compiled binary means every
-# clone carries a build for one architecture and one glibc version, and the
-# installer rebuilds it anyway.
-/tools/dawn-theme
-
 # Cargo build directory for tools/typist (also ignored by its own .gitignore,
 # repeated here so a clean `git status` at the repo root is trustworthy).
 target/
