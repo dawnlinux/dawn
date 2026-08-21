@@ -156,6 +156,10 @@ Symlinks are removed and the most recent backup is restored. Packages are left
 alone — they are ordinary Arch packages, and removing them is your call. If you
 switched to dawn-greet, revert that separately with the command above.
 
+## License
+
+MIT. See [LICENSE](LICENSE).
+
 ---
 
 <div align="center">
