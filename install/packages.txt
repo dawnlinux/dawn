@@ -1,0 +1,72 @@
+# ==========================================================================
+#  DAWN — PACKAGE MANIFEST
+# ==========================================================================
+#
+#  Every package Dawn needs, one per line. Blank lines and `#` comments are
+#  ignored; install.sh reads this file and nothing else, so this is the single
+#  source of truth for what a Dawn install pulls in.
+#
+#  EVERYTHING HERE IS IN THE OFFICIAL ARCH REPOSITORIES. Dawn deliberately
+#  has no AUR dependencies: an AUR helper is another thing to install, another
+#  thing to trust, and another thing that can break an install halfway through.
+#  If a feature would require an AUR package, it does not ship in core.
+#
+#  Adding a dependency? Add it here with a comment saying what uses it. A
+#  package nobody can point at is how a distro gets fat.
+# ==========================================================================
+
+
+# ── Compositor and shell ──────────────────────────────────────────────────
+
+hyprland                    # the Wayland compositor Dawn is built on
+quickshell                  # QML shell runtime; runs dawn-island and dawn-greet
+hyprlock                    # lock screen; the island's Lock tile hides without it
+xdg-desktop-portal-hyprland # screen sharing, file pickers, and app portals
+
+
+# ── Terminal, shell and editor ────────────────────────────────────────────
+
+kitty                       # the terminal. Super+Return
+fish                        # the login shell
+starship                    # the fish prompt (config/starship.toml)
+neovim                      # the editor
+
+
+# ── Desktop utilities ─────────────────────────────────────────────────────
+
+rofi                        # the clipboard picker ONLY — the island draws its own launcher
+                            # (rofi 2.0 speaks Wayland natively; rofi-wayland was merged upstream)
+awww                        # wallpaper daemon; driven by the island's wallpaper carousel
+cliphist                    # clipboard history store, read by the island
+wl-clipboard                # wl-copy / wl-paste, which cliphist is built on
+wtype                       # synthesises keystrokes for the Super+C / Super+V binds
+flameshot                   # screenshots. Super+U
+nautilus                    # file manager. Super+E
+
+
+# ── Hardware control ──────────────────────────────────────────────────────
+
+brightnessctl               # screen and keyboard backlight
+wireplumber                 # PipeWire session manager; `wpctl` drives the volume keys
+playerctl                   # MPRIS media keys, and the island's now-playing pane
+networkmanager              # network state shown in the island's status pane
+
+
+# ── Fonts ─────────────────────────────────────────────────────────────────
+
+ttf-jetbrains-mono-nerd     # kitty's font, and the island's UI font
+ttf-firacode-nerd           # fallback, and the editor's ligature font
+
+
+# ── Login screen ──────────────────────────────────────────────────────────
+#
+# greetd is installed but NOT enabled by this manifest. Switching display
+# manager is a separate, reversible step: config/greetd/install.sh.
+
+greetd                      # login daemon that hosts dawn-greet
+
+
+# ── Everyday ──────────────────────────────────────────────────────────────
+
+firefox                     # browser. Super+B
+fastfetch                   # the `ff` alias
