@@ -51,7 +51,9 @@ hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/quickshell/dawn-island/lau
 -- notification's action, Backspace dismisses, d silences.
 hl.bind(mainMod .. " + N", hl.dsp.global("quickshell:notifications"),
 	{ description = "Notification Centre (dawn-island)" })
-hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("flameshot gui --clipboard"), { description = "Screenshot" })
+hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("flameshot gui"), { description = "Screenshot" })
+-- hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("flameshot gui --clipboard"), { description = "Screenshot" })
+-- hl.bind(mainMod .. " + U", hl.dsp.exec_cmd("flameshot full"), { description = "Screenshot" })
 
 -- Session menu: lock / sleep / log out / restart / shut down, as a carousel in
 -- the island. Replaces the old straight-to-shutdown bind, which had no
