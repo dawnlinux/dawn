@@ -1,0 +1,20 @@
+[package]
+name = "dawn-theme"
+version = "0.1.0"
+edition = "2024"
+description = "Dawn's colour engine — drives matugen and reloads the desktop"
+
+[dependencies]
+# Argument parsing. `derive` keeps the CLI surface next to the types it fills.
+clap = { version = "4", features = ["derive"] }
+# theme.toml is written here and read by the island, so it has to be a real
+# serialised format rather than an ad-hoc one.
+serde = { version = "1", features = ["derive"] }
+toml = "0.8"
+serde_json = "1"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
