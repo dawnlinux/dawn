@@ -1,3 +1,37 @@
+# ── Generated at runtime ──────────────────────────────────────────────────
+#
 # Quickshell regenerates this per-run, pointing into /run/user/$UID.
 # Committing it makes the path wrong on every other machine and every reboot.
 .qmlls.ini
+
+# Neovim's own log. Machine-local noise, never useful to anyone else.
+nvim.log
+
+# ── Build output ──────────────────────────────────────────────────────────
+#
+# `make -C tools` produces this. Committing a compiled binary means every
+# clone carries a build for one architecture and one glibc version, and the
+# installer rebuilds it anyway.
+/tools/dawn-theme
+
+# Cargo build directory for tools/typist (also ignored by its own .gitignore,
+# repeated here so a clean `git status` at the repo root is trustworthy).
+target/
+
+# ── Editor and shell leftovers ────────────────────────────────────────────
+*.bak
+*~
+*.swp
+
+# ── Machine-local overrides ───────────────────────────────────────────────
+#
+# Hardware- and host-specific settings live here so that shared config stays
+# portable. See config/hypr/modules/local.lua.example for the contract.
+/config/hypr/modules/local.lua
+
+# ── Personal ──────────────────────────────────────────────────────────────
+#
+# Journals and scratch templates that happen to live in this checkout but are
+# not part of the distribution.
+/notes/
+/templates/
