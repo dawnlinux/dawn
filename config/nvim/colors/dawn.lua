@@ -63,6 +63,51 @@ local function palette()
 	return merged
 end
 
+--- Re-apply this scheme whenever dawn-theme rewrites the palette.
+---
+--- Every other surface in Dawn repaints live: the island watches colors.json
+--- through FileView, kitty takes a signal, Hyprland is reloaded. Without this
+--- the editor would be the one thing left on a stale palette until it was
+--- restarted.
+---
+--- The watch is torn down as soon as another colourscheme is selected, so
+--- picking `koda` does not leave a file watcher running for a scheme that is
+--- no longer in use.
+local function watch(path)
+    local uv = vim.uv or vim.loop
+    local handle = uv.new_fs_event()
+    if not handle then
+        return
+    end
+
+    local reapplying = false
+
+    handle:start(path, {}, function(err)
+        if err or reapplying then
+            return
+        end
+        reapplying = true
+        vim.schedule(function()
+            -- Only if this scheme is still the active one. A watch that
+            -- outlives its scheme would yank the user back to dawn.
+            if vim.g.colors_name == "dawn" then
+                pcall(vim.cmd.colorscheme, "dawn")
+            end
+            reapplying = false
+        end)
+    end)
+
+    vim.api.nvim_create_autocmd("ColorScheme", {
+        once = true,
+        callback = function(ev)
+            if ev.match ~= "dawn" and not handle:is_closing() then
+                handle:stop()
+                handle:close()
+            end
+        end,
+    })
+end
+
 vim.cmd.highlight("clear")
 if vim.fn.exists("syntax_on") == 1 then
 	vim.cmd.syntax("reset")
@@ -128,3 +173,8 @@ hl("DiffAdd", { fg = c.ok })
 hl("DiffDelete", { fg = c.error })
 hl("DiffChange", { fg = c.warn })
 hl("DiffText", { fg = c.warn, bold = true })
+
+-- ── Follow the palette ────────────────────────────────────────────────────
+--
+-- Started last, so a failure here cannot leave the scheme half-applied.
+watch(vim.fn.expand("~/.config/dawn/generated/nvim-colors.lua"))
