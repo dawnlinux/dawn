@@ -112,8 +112,8 @@ jobs:
           cp out/dawn.gpg pacman-repo/dawn.gpg
 
           cd pacman-repo
-          git config user.name  'dawn-release'
-          git config user.email 'themarathondev7@gmail.com'
+          git config user.name  'jhayonline'
+          git config user.email 'jhaycodes999@gmail.com'
           git add -A
           if git diff --cached --quiet; then
             echo "nothing changed"
