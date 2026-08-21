@@ -44,18 +44,31 @@ flameshot                   # screenshots. Super+U
 nautilus                    # file manager. Super+E
 
 
+# ── Media pipeline ────────────────────────────────────────────────────────
+
+pipewire                    # audio server
+pipewire-pulse              # PulseAudio compatibility, so ordinary apps find the sink
+wireplumber                 # PipeWire session manager; `wpctl` drives the volume keys
+playerctl                   # MPRIS media keys, and the island's now-playing pane
+ffmpeg                      # samples the wallpaper down to 16x16 so Accent.qml can
+                            # pull the desktop's accent colour out of it. Without this
+                            # the whole interface stays monochrome.
+
+
 # ── Hardware control ──────────────────────────────────────────────────────
 
 brightnessctl               # screen and keyboard backlight
-wireplumber                 # PipeWire session manager; `wpctl` drives the volume keys
-playerctl                   # MPRIS media keys, and the island's now-playing pane
+upower                      # battery and AC state in the island's status pane
+bluez                       # bluetooth stack, read via Quickshell.Bluetooth
+bluez-utils                 # bluetoothctl, and the adapter interface bluez needs
 networkmanager              # network state shown in the island's status pane
 
 
 # ── Fonts ─────────────────────────────────────────────────────────────────
 
-ttf-jetbrains-mono-nerd     # kitty's font, and the island's UI font
-ttf-firacode-nerd           # fallback, and the editor's ligature font
+inter-font                  # the island's UI typeface (Font.family in theme/)
+ttf-jetbrains-mono-nerd     # kitty's font, and every icon glyph in the island
+ttf-firacode-nerd           # editor ligatures
 
 
 # ── Login screen ──────────────────────────────────────────────────────────

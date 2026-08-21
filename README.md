@@ -29,7 +29,7 @@ Dawn is where your system comes to life.
 - An existing **Arch Linux** install (or an Arch derivative with `pacman`)
 - A machine that can run Wayland
 
-That is all. **Dawn has no AUR dependencies** — every one of its 24 packages
+That is all. **Dawn has no AUR dependencies** — every one of its 31 packages
 comes from the official repositories, so there is no AUR helper to install, to
 trust, or to break an install halfway through.
 
