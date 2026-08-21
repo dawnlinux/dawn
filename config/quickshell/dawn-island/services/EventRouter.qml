@@ -130,7 +130,7 @@ Item {
     // key and later escaping out of it should leave you at the desktop, not in
     // a panel you had forgotten about.
 
-    readonly property var keyboardPanels: [Launcher, Nav, Wallpaper, Notifs, Session]
+    readonly property var keyboardPanels: [Launcher, Nav, Wallpaper, Notifs, Session, Keybinds]
 
     function _closeOthers(winner) {
         for (const panel of keyboardPanels)
@@ -161,6 +161,11 @@ Item {
     Connections {
         target: Session
         function onOpenChanged() { if (Session.open) root._closeOthers(Session); }
+    }
+
+    Connections {
+        target: Keybinds
+        function onOpenChanged() { if (Keybinds.open) root._closeOthers(Keybinds); }
     }
 
     // ── Expensive things, switched on only while visible ───────────────────

@@ -214,11 +214,13 @@ Singleton {
         /// Above the rest: if you asked to shut the machine down, nothing
         /// arriving afterwards is more important than that question.
         "power":        198,
-        "launcher":     200,
-        /// Level with the launcher: both are things you asked for explicitly,
-        /// and the cheatsheet exists to be readable while you decide what to
-        /// press next.
-        "keybinds":     200
+        /// Below the launcher and the session menu, above the carousel.
+        ///
+        /// NOT level with the launcher: _recompute picks the first state with
+        /// a strictly greater priority, so a tie is resolved by whichever key
+        /// happens to be iterated first — which is to say, arbitrarily.
+        "keybinds":     196,
+        "launcher":     200
     })
 
     // ─────────────────────────────────────────────────────────────────────
