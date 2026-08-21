@@ -1,0 +1,28 @@
+# Dawn colour engine — template declarations.
+#
+# Rendered by `dawn-theme`, which passes this file with --config and always
+# supplies --prefer, because matugen 4.1 refuses to run on a multi-colour
+# image with no terminal attached.
+#
+# ── post_hook is for file placement only ──────────────────────────────────
+#
+# It is never used to reload anything. A failing post_hook does NOT fail
+# matugen — it prints an error and matugen still exits 0 — so a reload issued
+# here would fail invisibly. dawn-theme runs every reload itself and reports
+# each one by name.
+#
+# ── Why output goes to ~/.config/dawn/generated ───────────────────────────
+#
+# Not ~/.config/matugen/generated: that path sits inside a directory Dawn
+# symlinks read-only from /usr/share. ~/.config/dawn/ is the one directory
+# that is writable, outside every symlink, and never touched by pacman.
+
+[config]
+
+# The island's palette. Rendered as DATA, not as QML: the island's theme
+# directory is read-only in a packaged install, so there is nowhere to put a
+# generated QML file that Quickshell would still resolve. theme/Colors.qml
+# reads this file through FileView and repaints the moment it changes.
+[templates.island]
+input_path  = '~/.config/dawn/templates/dawn-colors.json'
+output_path = '~/.config/dawn/generated/colors.json'
