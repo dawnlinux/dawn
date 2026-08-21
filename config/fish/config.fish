@@ -15,13 +15,15 @@ alias spit "cp ~/software/php/SPIT/spit.php . && touch content.txt"
 alias ii "sudo pacman -S"
 alias yy "yay -S"
 
-alias nvm "nvim"
+alias nvm "nvim ."
 
 alias yt "yt-dlp"
 
 alias fish "source ~/.config/fish/config.fish"
 
 alias play "ffplay"
+
+alias bankai "php artisan"
 
 # Created by `pipx` on 2026-08-05 10:41:00
 set PATH $PATH /home/jhayonline/.local/bin
