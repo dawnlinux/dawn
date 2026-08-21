@@ -250,3 +250,13 @@ teardown() {
     [ -L "$XDG_CONFIG_HOME/rofi" ]
     [ "$(readlink -f "$XDG_CONFIG_HOME/rofi")" = "$(readlink -f "$TESTDIR/elsewhere")" ]
 }
+
+@test "seed finds examples beside the source in dev mode too" {
+    mkdir -p "$TESTDIR/checkout/config/kitty" "$TESTDIR/checkout/examples"
+    echo 'x'              > "$TESTDIR/checkout/config/kitty/kitty.conf"
+    echo '-- dev example' > "$TESTDIR/checkout/examples/local.lua"
+
+    run "$DAWN" dev "$TESTDIR/checkout"
+    [ "$status" -eq 0 ]
+    [ "$(cat "$XDG_CONFIG_HOME/dawn/local.lua")" = "-- dev example" ]
+}
