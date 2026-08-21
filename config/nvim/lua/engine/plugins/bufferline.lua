@@ -19,7 +19,8 @@ return {
 			local tabline_fill = hl("TabLineFill")
 			local tabline = hl("TabLine")
 			local normal = hl("Normal")
-			local fill_bg = (tabline_fill and tabline_fill.bg) or (tabline and tabline.bg) or (normal and normal.bg)
+			local fill_bg = (tabline_fill and tabline_fill.bg) or (tabline and tabline.bg) or
+			(normal and normal.bg)
 
 			if fill_bg then
 				vim.api.nvim_set_hl(0, "BufferLineFill", { bg = fill_bg })
@@ -42,17 +43,23 @@ return {
 
 			vim.api.nvim_set_hl(0, "BufferLineBackground", { bg = base_bg, fg = base_fg })
 			vim.api.nvim_set_hl(0, "BufferLineBufferVisible", { bg = base_bg, fg = base_fg })
-			vim.api.nvim_set_hl(0, "BufferLineBufferSelected", { bg = selected_bg, fg = selected_fg, bold = true })
+			vim.api.nvim_set_hl(0, "BufferLineBufferSelected",
+				{ bg = selected_bg, fg = selected_fg, bold = true })
 			vim.api.nvim_set_hl(0, "BufferLineDuplicate", { bg = base_bg, fg = base_fg })
 			vim.api.nvim_set_hl(0, "BufferLineDuplicateVisible", { bg = base_bg, fg = base_fg })
-			vim.api.nvim_set_hl(0, "BufferLineDuplicateSelected", { bg = selected_bg, fg = selected_fg, bold = true })
-			vim.api.nvim_set_hl(0, "BufferLineModified", { bg = base_bg, fg = fg_or_nil("DiagnosticWarn") or base_fg })
-			vim.api.nvim_set_hl(0, "BufferLineModifiedVisible", { bg = base_bg, fg = fg_or_nil("DiagnosticWarn") or base_fg })
-			vim.api.nvim_set_hl(0, "BufferLineModifiedSelected", { bg = selected_bg, fg = fg_or_nil("DiagnosticWarn") or selected_fg })
+			vim.api.nvim_set_hl(0, "BufferLineDuplicateSelected",
+				{ bg = selected_bg, fg = selected_fg, bold = true })
+			vim.api.nvim_set_hl(0, "BufferLineModified",
+				{ bg = base_bg, fg = fg_or_nil("DiagnosticWarn") or base_fg })
+			vim.api.nvim_set_hl(0, "BufferLineModifiedVisible",
+				{ bg = base_bg, fg = fg_or_nil("DiagnosticWarn") or base_fg })
+			vim.api.nvim_set_hl(0, "BufferLineModifiedSelected",
+				{ bg = selected_bg, fg = fg_or_nil("DiagnosticWarn") or selected_fg })
 			vim.api.nvim_set_hl(0, "BufferLineSeparator", { bg = base_bg, fg = base_bg })
 			vim.api.nvim_set_hl(0, "BufferLineSeparatorVisible", { bg = base_bg, fg = base_bg })
 			vim.api.nvim_set_hl(0, "BufferLineSeparatorSelected", { bg = selected_bg, fg = selected_bg })
-			vim.api.nvim_set_hl(0, "BufferLineIndicatorSelected", { bg = selected_bg, fg = fg_or_nil("Special") or selected_fg })
+			vim.api.nvim_set_hl(0, "BufferLineIndicatorSelected",
+				{ bg = selected_bg, fg = fg_or_nil("Special") or selected_fg })
 		end
 
 		local options = {

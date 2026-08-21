@@ -19,6 +19,9 @@ keymap.set("n", "<C-Right>", ":vertical resize +4<CR>", { desc = "Wider" })
 -- tab management
 keymap.set("n", "<Tab>", "<cmd>BufferLineCycleNext<CR>", { desc = "Go to next buffer" })
 keymap.set("n", "<S-Tab>", "<cmd>BufferLineCyclePrev<CR>", { desc = "Go to previous buffer" })
+-- same thing on Shift+h / Shift+l, for switching tabs without leaving the home row
+keymap.set("n", "<S-l>", "<cmd>BufferLineCycleNext<CR>", { desc = "Go to next buffer (right)" })
+keymap.set("n", "<S-h>", "<cmd>BufferLineCyclePrev<CR>", { desc = "Go to previous buffer (left)" })
 keymap.set("n", "<leader>x", "<cmd>bdelete<CR>", { desc = "Close current buffer" })
 keymap.set("n", "<leader>n", "<cmd>tabnew<CR>", { desc = "New tab" })
 keymap.set("v", "J", ":m '>+1<CR>gv=gv")
@@ -44,4 +47,3 @@ keymap.set("t", "<Esc>", [[<C-\><C-n>]])
 keymap.set("i", "jk", "<Esc>", { desc = "Exit insert mode with jk" })
 -- Exit insert mode with jk in terminal
 keymap.set("t", "jk", "<C-\\><C-n>", { desc = "Exit terminal mode with jk" })
-

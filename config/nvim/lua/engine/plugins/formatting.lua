@@ -14,8 +14,14 @@ return {
 			jsonc = { "prettier" },
 			markdown = { "prettier" },
 			html = { "prettier" },
+			qml = { "qmlformat" },
 		},
 		formatters = {
+			-- conform ships a qmlformat definition, but Qt names the binary
+			-- qmlformat6 on Arch.
+			qmlformat = {
+				command = vim.fn.executable("qmlformat6") == 1 and "qmlformat6" or "qmlformat",
+			},
 			pint = {
 				command = "./vendor/bin/pint",
 				args = { "$FILENAME" },

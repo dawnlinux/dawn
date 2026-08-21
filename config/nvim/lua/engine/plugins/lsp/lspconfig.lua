@@ -1,6 +1,6 @@
 return {
 	"neovim/nvim-lspconfig",
-	event = { "bufreadpre", "bufnewfile" },
+	event = { "BufReadPre", "BufNewFile" },
 	dependencies = {
 		"hrsh7th/cmp-nvim-lsp",
 		{ "antosha417/nvim-lsp-file-operations", config = true },
@@ -9,7 +9,7 @@ return {
 	config = function()
 		local lspconfig = require("lspconfig")
 		local keymap = vim.keymap
-		local qt_clangd_flag_pattern = "^unknown argument:%s*['\"]?%-mno%-direct%-extern%-access['\"]?"
+		local qt_clangd_flag_pattern = "^[Uu]nknown argument:%s*['\"]?%-mno%-direct%-extern%-access['\"]?"
 
 		-- Defer loading cmp_nvim_lsp until needed to avoid dependency issues
 		local function get_capabilities()
@@ -21,8 +21,8 @@ return {
 			return vim.lsp.protocol.make_client_capabilities()
 		end
 
-		local default_publish_diagnostics = vim.lsp.handlers["textdocument/publishdiagnostics"]
-		vim.lsp.handlers["textdocument/publishdiagnostics"] = function(err, result, ctx, config)
+		local default_publish_diagnostics = vim.lsp.handlers["textDocument/publishDiagnostics"]
+		vim.lsp.handlers["textDocument/publishDiagnostics"] = function(err, result, ctx, config)
 			local client = ctx and vim.lsp.get_client_by_id(ctx.client_id)
 			if client and client.name == "clangd" and result and result.diagnostics then
 				result = vim.deepcopy(result)
@@ -36,18 +36,18 @@ return {
 		end
 
 		-- setup keymaps when lsp attaches
-		vim.api.nvim_create_autocmd("lspattach", {
-			group = vim.api.nvim_create_augroup("userlspconfig", {}),
+		vim.api.nvim_create_autocmd("LspAttach", {
+			group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 			callback = function(ev)
 				local opts = { buffer = ev.buf, silent = true }
 
 				local client = vim.lsp.get_client_by_id(ev.data.client_id)
-				if client and client.server_capabilities.semantictokensprovider then
-					client.server_capabilities.semantictokensprovider = nil
+				if client and client.server_capabilities.semanticTokensProvider then
+					client.server_capabilities.semanticTokensProvider = nil
 				end
 
 				opts.desc = "show lsp references"
-				keymap.set("n", "gr", "<cmd>telescope lsp_references<cr>", opts)
+				keymap.set("n", "gr", "<cmd>Telescope lsp_references<cr>", opts)
 
 				opts.desc = "go to declaration"
 				keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
@@ -56,10 +56,10 @@ return {
 				keymap.set("n", "gd", vim.lsp.buf.definition, opts)
 
 				opts.desc = "show lsp implementations"
-				keymap.set("n", "gi", "<cmd>telescope lsp_implementations<cr>", opts)
+				keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<cr>", opts)
 
 				opts.desc = "show lsp type definitions"
-				keymap.set("n", "gt", "<cmd>telescope lsp_type_definitions<cr>", opts)
+				keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<cr>", opts)
 
 				opts.desc = "see available code actions"
 				keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
@@ -68,7 +68,7 @@ return {
 				keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
 
 				opts.desc = "show buffer diagnostics"
-				keymap.set("n", "<leader>d", "<cmd>telescope diagnostics bufnr=0<cr>", opts)
+				keymap.set("n", "<leader>d", "<cmd>Telescope diagnostics bufnr=0<cr>", opts)
 
 				opts.desc = "show line diagnostics"
 				keymap.set("n", "<leader>dl", vim.diagnostic.open_float, opts)
@@ -83,7 +83,35 @@ return {
 				keymap.set("n", "K", vim.lsp.buf.hover, opts) -- Changed to Shift+K
 
 				opts.desc = "restart lsp"
-				keymap.set("n", "<leader>rs", ":lsprestart<cr>", opts)
+				keymap.set("n", "<leader>rs", function()
+					-- Servers here are started through vim.lsp.enable(), so
+					-- there is no :LspRestart to call: stop whatever is
+					-- attached and let the reload re-trigger the autostart.
+					local bufnr = vim.api.nvim_get_current_buf()
+					local clients = vim.lsp.get_clients({ bufnr = bufnr })
+
+					if #clients == 0 then
+						vim.notify("No LSP client attached to this buffer", vim.log.levels.WARN)
+						return
+					end
+
+					local names = vim.tbl_map(function(client)
+						return client.name
+					end, clients)
+
+					for _, client in ipairs(clients) do
+						client:stop()
+					end
+
+					vim.defer_fn(function()
+						if vim.api.nvim_buf_is_valid(bufnr) then
+							vim.api.nvim_buf_call(bufnr, function()
+								vim.cmd("edit")
+							end)
+						end
+						vim.notify("Restarted: " .. table.concat(names, ", "), vim.log.levels.INFO)
+					end, 500)
+				end, opts)
 
 				-- enable inlay hints if supported
 				local client = vim.lsp.get_client_by_id(ev.data.client_id)
@@ -96,7 +124,7 @@ return {
 				    or path:match("%.hxx$")
 				    or path:match("%.inl$")
 
-				if client and client.server_capabilities.inlayhintprovider and not disable_inlay_hints then
+				if client and client.server_capabilities.inlayHintProvider and not disable_inlay_hints then
 					vim.lsp.inlay_hint.enable(true, { bufnr = ev.buf })
 				end
 			end,
@@ -105,20 +133,24 @@ return {
 		-- Get capabilities safely
 		local capabilities = get_capabilities()
 
-		-- diagnostic signs
-		local signs = { error = " ", warn = " ", hint = "󰠠 ", info = " " }
-		for type, icon in pairs(signs) do
-			local hl = "diagnosticsign" .. type
-			vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-		end
+		-- inline diagnostics (virtual text) + sign column icons
+		local severity = vim.diagnostic.severity
 
-		-- inline diagnostics (virtual text)
 		vim.diagnostic.config({
 			virtual_text = {
 				prefix = "●",
 				spacing = 2,
 			},
-			signs = true,
+			-- Signs used to be registered with sign_define("DiagnosticSign…"),
+			-- which is deprecated since 0.10; the icons belong here now.
+			signs = {
+				text = {
+					[severity.ERROR] = " ",
+					[severity.WARN] = " ",
+					[severity.HINT] = "󰠠 ",
+					[severity.INFO] = " ",
+				},
+			},
 			underline = true,
 			update_in_insert = false,
 			severity_sort = true,
@@ -153,7 +185,7 @@ return {
 				"--query-driver=/usr/bin/c++,/usr/bin/g++",
 			},
 			init_options = {
-				fallbackflags = {
+				fallbackFlags = {
 					"-std=c++23",
 				},
 			},
@@ -166,19 +198,19 @@ return {
 		vim.lsp.config("lua_ls", {
 			capabilities = capabilities,
 			settings = {
-				lua = {
+				Lua = {
 					runtime = {
-						version = "luajit",
+						version = "LuaJIT",
 					},
 					diagnostics = {
 						globals = { "vim" },
 					},
 					workspace = {
-						checkthirdparty = false,
+						checkThirdParty = false,
 						library = vim.api.nvim_get_runtime_file("", true),
 					},
 					completion = {
-						callsnippet = "replace",
+						callSnippet = "Replace",
 					},
 				},
 			},
@@ -186,7 +218,7 @@ return {
 		vim.lsp.enable("lua_ls")
 
 		-- auto-format on save
-		vim.api.nvim_create_autocmd("bufwritepre", {
+		vim.api.nvim_create_autocmd("BufWritePre", {
 			callback = function(ev)
 				local ft = vim.bo[ev.buf].filetype
 				local cpp_like = vim.tbl_contains({ "c", "cpp", "objc", "objcpp" }, ft)
@@ -218,15 +250,15 @@ return {
 			capabilities = capabilities,
 			settings = {
 				["rust-analyzer"] = {
-					inlayhints = {
-						typehints = { enable = true },
-						parameterhints = { enable = false },
-						chaininghints = { enable = false },
-						bindingmodehints = { enable = false },
-						closurereturntypehints = { enable = "never" },
-						lifetimeelisionhints = { enable = "never" },
-						reborrowhints = { enable = false },
-						closingbracehints = { enable = false },
+					inlayHints = {
+						typeHints = { enable = true },
+						parameterHints = { enable = false },
+						chainingHints = { enable = false },
+						bindingModeHints = { enable = false },
+						closureReturnTypeHints = { enable = "never" },
+						lifetimeElisionHints = { enable = "never" },
+						reborrowHints = { enable = false },
+						closingBraceHints = { enable = false },
 					},
 				},
 			},
@@ -306,9 +338,9 @@ return {
 			settings = {
 				python = {
 					analysis = {
-						autosearchpaths = true,
-						diagnosticmode = "workspace",
-						usellibrarycodefortypes = true,
+						autoSearchPaths = true,
+						diagnosticMode = "workspace",
+						useLibraryCodeForTypes = true,
 					},
 				},
 			},
@@ -424,6 +456,31 @@ return {
 			filetypes = { "zig", "zir" },
 		})
 		vim.lsp.enable("zls")
+
+		-- ============================
+		-- qml / quickshell
+		-- ============================
+		-- Arch ships the binary as `qmlls6`; most other distros use `qmlls`.
+		local qmlls_bin = (vim.fn.executable("qmlls6") == 1 and "qmlls6")
+		    or (vim.fn.executable("qmlls") == 1 and "qmlls")
+		    or nil
+
+		if qmlls_bin then
+			vim.lsp.config("qmlls", {
+				capabilities = capabilities,
+				-- Deliberately no `-I`: passing any import path on argv *replaces* the
+				-- ones in .qmlls.ini, and that file is how Quickshell points qmlls at
+				-- the generated module tree that makes `import qs.*` resolve.
+				-- `-E` only appends QML_IMPORT_PATH, so it's safe.
+				cmd = { qmlls_bin, "-E" },
+				filetypes = { "qml", "qmljs" },
+				-- .qmlls.ini / shell.qml mark a Quickshell config root; keep them ahead
+				-- of .git so a dotfiles repo doesn't drag the root up to ~/.config.
+				root_markers = { ".qmlls.ini", "shell.qml", ".git" },
+			})
+
+			vim.lsp.enable("qmlls")
+		end
 
 		-- ============================
 		-- tailwindcss
