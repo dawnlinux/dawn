@@ -169,7 +169,7 @@ Stopping SDDM ends your desktop session, so save first.
 From any TTY (`Ctrl+Alt+F2`):
 
 ```sh
-sudo ~/software/dawn/config/greetd/install.sh --revert
+sudo /path/to/dawn/config/greetd/install.sh --revert
 sudo systemctl start sddm
 ```
 
