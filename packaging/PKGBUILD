@@ -26,6 +26,12 @@ url='https://github.com/dawnlinux/dawn'
 license=('MIT')
 makedepends=('git' 'cargo')
 
+# No debug package. typist is built with `strip = true` in its release profile,
+# so a -debug package would carry no usable symbols anyway, and whether one
+# gets built otherwise depends on the builder's makepkg.conf — which makes the
+# set of produced packages non-deterministic across machines and CI.
+options=('!debug')
+
 # DAWN_LOCAL_SOURCE builds from the working tree instead of the published tag,
 # so the packaging can be verified before a release exists. Releases always
 # build from the tag; the workflow never sets this.
