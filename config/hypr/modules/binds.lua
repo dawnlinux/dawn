@@ -204,8 +204,8 @@ hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true 
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
 
--- Mac keyboard backlight
-hl.bind("XF86KbdBrightnessUp", hl.dsp.exec_cmd("brightnessctl --device='smc::kbd_backlight' set +10%"),
-	{ locked = true, repeating = true })
-hl.bind("XF86KbdBrightnessDown", hl.dsp.exec_cmd("brightnessctl --device='smc::kbd_backlight' set 10%-"),
-	{ locked = true, repeating = true })
+-- Keyboard backlight is deliberately not bound here. brightnessctl needs the
+-- device by name and that name is vendor-specific (`smc::kbd_backlight` on a
+-- MacBook, `asus::kbd_backlight`, `tpacpi::kbd_backlight`, ...). Run
+-- `brightnessctl --list` to find yours and bind it in modules/local.lua —
+-- local.lua.example has the two lines ready to uncomment.

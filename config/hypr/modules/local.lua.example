@@ -1,0 +1,109 @@
+--[[ =========================================================================
+  DAWN — MACHINE-LOCAL HYPRLAND OVERRIDES
+
+  Copy this file to `local.lua` in the same directory and edit it:
+
+      cp ~/.config/hypr/modules/local.lua.example ~/.config/hypr/modules/local.lua
+
+  `local.lua` is gitignored, so nothing you put here is ever committed and
+  `git pull` will never conflict with it. That is the whole point: shared Dawn
+  config stays portable, and everything true of only YOUR machine lives here.
+
+  It is required LAST by hyprland.lua, so anything here overrides every other
+  module. Same `hl.*` API — this is a normal Hyprland Lua module.
+
+  If this file exists but has an error, Hyprland logs a line starting with
+  `dawn:`. Find it with:
+
+      hyprctl rollinglog | grep '^dawn:'
+
+  Everything below is commented out. Uncomment only what applies to you.
+========================================================================== ]]
+
+
+-- ── Monitors ─────────────────────────────────────────────────────────────
+--
+-- `hyprctl monitors` lists your outputs and the modes they advertise.
+-- The shipped config sets every output to "preferred"; a rule here replaces
+-- it for the named output only.
+--
+-- Example — HDMI 1.4a cannot carry 4K at 60Hz, so a 4K TV negotiates
+-- 2160p@30 under "preferred" and the whole desktop feels laggy. Forcing
+-- 1080p60 trades resolution for a refresh rate you can actually use:
+--
+-- for _, out in ipairs({ "HDMI-A-1", "HDMI-A-2", "HDMI-A-3" }) do
+-- 	hl.monitor({
+-- 		output   = out,
+-- 		mode     = "1920x1080@60",
+-- 		position = "auto",
+-- 		scale    = 1,
+-- 	})
+-- end
+--
+-- Example — a fixed dual-monitor layout:
+--
+-- hl.monitor({ output = "DP-1",   mode = "2560x1440@144", position = "0x0",    scale = 1 })
+-- hl.monitor({ output = "eDP-1",  mode = "preferred",     position = "2560x0", scale = 1.25 })
+
+
+-- ── GPU and driver hints ─────────────────────────────────────────────────
+--
+-- Example — Haswell and older Intel. intel-media-driver's iHD backend only
+-- supports Broadwell and newer, so libva picks it, fails with
+-- "iHD_drv_video.so init failed", and every video decodes on the CPU. Naming
+-- the older i965 driver explicitly restores hardware decode:
+--
+-- hl.env("LIBVA_DRIVER_NAME", "i965")
+--
+-- Example — NVIDIA:
+--
+-- hl.env("LIBVA_DRIVER_NAME", "nvidia")
+-- hl.env("GBM_BACKEND", "nvidia-drm")
+-- hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
+--
+-- Example — pick which GPU Hyprland renders on, when you have two:
+--
+-- hl.env("AQ_DRM_DEVICES", "/dev/dri/card1:/dev/dri/card0")
+
+
+-- ── Keyboard backlight ───────────────────────────────────────────────────
+--
+-- brightnessctl addresses backlights by device name and that name is
+-- vendor-specific. `brightnessctl --list` shows yours. Common ones:
+--
+--   smc::kbd_backlight      Apple / MacBook
+--   asus::kbd_backlight     ASUS
+--   tpacpi::kbd_backlight   ThinkPad
+--
+-- hl.bind("XF86KbdBrightnessUp",
+-- 	hl.dsp.exec_cmd("brightnessctl --device='smc::kbd_backlight' set +10%"),
+-- 	{ locked = true, repeating = true })
+-- hl.bind("XF86KbdBrightnessDown",
+-- 	hl.dsp.exec_cmd("brightnessctl --device='smc::kbd_backlight' set 10%-"),
+-- 	{ locked = true, repeating = true })
+
+
+-- ── Input ────────────────────────────────────────────────────────────────
+--
+-- Per-device input settings. `hyprctl devices` lists the names.
+--
+-- hl.device({
+-- 	name = "apple-inc.-apple-internal-keyboard-/-trackpad",
+-- 	kb_layout = "us",
+-- })
+
+
+-- ── Personal keybinds ────────────────────────────────────────────────────
+--
+-- Binds that are yours alone. These override a shipped bind on the same key.
+--
+-- hl.bind("SUPER + G", hl.dsp.exec_cmd("steam"), { description = "Steam" })
+
+
+-- ── Autostart ────────────────────────────────────────────────────────────
+--
+-- Extra things to launch at session start, on this machine only.
+--
+-- hl.on("hyprland.start", function()
+-- 	hl.exec_cmd("nextcloud --background")
+-- end)
