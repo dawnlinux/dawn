@@ -45,8 +45,13 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
-    /// Derive the palette from an image.
-    Wallpaper { path: PathBuf },
+    /// Set the wallpaper and derive the palette from it.
+    Wallpaper {
+        path: PathBuf,
+        /// Derive colours from the image without putting it on the desktop.
+        #[arg(long)]
+        no_set: bool,
+    },
     /// Derive the palette from a seed colour, as #rrggbb.
     Color { hex: String },
     /// One of matugen's nine schemes, with or without the `scheme-` prefix.
@@ -72,11 +77,21 @@ fn main() -> ExitCode {
     let mut theme = Theme::load();
 
     match cli.command {
-        Cmd::Wallpaper { path } => match path.canonicalize() {
+        Cmd::Wallpaper { path, no_set } => match path.canonicalize() {
             // Canonicalised so the stored state survives being run from a
             // different directory, and so a typo fails now rather than inside
             // matugen.
-            Ok(path) => theme.source = Source::Wallpaper { path },
+            Ok(path) => {
+                if !no_set {
+                    // Set it BEFORE rendering. A palette derived from an image
+                    // that is not on screen is the confusing case this avoids.
+                    if let Err(e) = reload::set_wallpaper(&path) {
+                        eprintln!("warning: could not set the wallpaper: {e}");
+                        eprintln!("         theming from it anyway");
+                    }
+                }
+                theme.source = Source::Wallpaper { path };
+            }
             Err(e) => return fail(format!("{}: {e}", path.display())),
         },
 

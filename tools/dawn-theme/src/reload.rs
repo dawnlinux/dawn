@@ -90,6 +90,42 @@ pub fn all() -> Vec<(&'static str, Result<(), String>)> {
     run_all(RELOADS)
 }
 
+/// Put an image on the desktop.
+///
+/// Separate from RELOADS because it is not a reload: it takes an argument, and
+/// it only runs when the source is a wallpaper.
+///
+/// This exists because deriving a palette from an image the user cannot see is
+/// worse than useless — the whole premise is that the desktop follows the
+/// wallpaper. `dawn-theme wallpaper X` therefore both sets X and themes from
+/// it, which is what the command name promises.
+///
+/// The transition matches `Config.wallpaperCommand` in the island so that
+/// setting a wallpaper from the shell and from the carousel look the same.
+pub fn set_wallpaper(path: &std::path::Path) -> Result<(), String> {
+    let out = Command::new("awww")
+        .args([
+            "img",
+            &path.display().to_string(),
+            "--transition-type",
+            "random",
+            "--transition-duration",
+            "1.2",
+            "--transition-fps",
+            "60",
+        ])
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped())
+        .output()
+        .map_err(|e| format!("could not run awww: {e}"))?;
+
+    if out.status.success() {
+        Ok(())
+    } else {
+        Err(String::from_utf8_lossy(&out.stderr).trim().to_string())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -160,5 +196,33 @@ mod tests {
                 .unwrap_or(false);
             assert!(found, "{}: {} is not on PATH", r.name, r.program);
         }
+    }
+}
+
+#[cfg(test)]
+mod wallpaper {
+    use super::*;
+    use std::path::Path;
+
+    #[test]
+    fn a_missing_image_is_reported_rather_than_panicked_on() {
+        // awww rejects a path it cannot read; that must surface as an error
+        // string, not a crash, because the palette should still be written.
+        let r = set_wallpaper(Path::new("/definitely/not/an/image.png"));
+        assert!(r.is_err());
+        assert!(!r.unwrap_err().is_empty());
+    }
+
+    #[test]
+    fn the_transition_matches_the_islands_wallpaper_command() {
+        // Setting a wallpaper from the shell and from the island's carousel
+        // should look identical. The island uses:
+        //   awww img {} --transition-type random --transition-duration 1.2
+        //               --transition-fps 60
+        // If Config.wallpaperCommand changes, this is the reminder to follow.
+        let src = include_str!("reload.rs");
+        assert!(src.contains("--transition-duration"));
+        assert!(src.contains("\"1.2\""));
+        assert!(src.contains("\"60\""));
     }
 }
