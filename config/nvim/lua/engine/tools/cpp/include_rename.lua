@@ -193,7 +193,14 @@ function M.setup(api)
 		return
 	end
 
+	-- setup() runs both at startup and again when nvim-tree lazy-loads, so keep
+	-- the subscription single.
+	if M.wired then
+		return
+	end
+
 	api.events.subscribe(api.events.Event.NodeRenamed, M.on_node_renamed)
+	M.wired = true
 end
 
 return M

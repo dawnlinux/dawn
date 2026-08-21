@@ -1,52 +1,61 @@
 -- lua/engine/tools/init.lua
+--
+-- Registry for the hand-written, per-language toolkits. Each entry lives in its
+-- own directory and owns its commands and autocmds:
+--
+--   engine.tools.cpp     :Skel, :CppExtractDefinitions,
+--                        :CppExtractFunctionDefinition, include sorting on save,
+--                        include rewriting on rename
+--   engine.tools.java    :Java, :JavaClass and friends, :JavaPackage
+--   engine.tools.typst   :TypstPreview, compile on save
+--   engine.tools.go      :Skel only — no commands and no autocmds of its own,
+--                        so it is required lazily and is not in TOOLKITS
+--
+-- :Skel is shared: it dispatches to whichever toolkit owns the current
+-- filetype, so the same key works in a header and in a .java file.
+
 local M = {}
 
+local TOOLKITS = {
+	"engine.tools.cpp",
+	"engine.tools.java",
+	"engine.tools.typst",
+}
+
+-- filetype -> toolkit module that can fill an empty file with a Skeleton
+local SKELETON_HANDLERS = {
+	c = "engine.tools.cpp",
+	cpp = "engine.tools.cpp",
+	objc = "engine.tools.cpp",
+	objcpp = "engine.tools.cpp",
+	java = "engine.tools.java",
+	go = "engine.tools.go",
+}
+
+local function Skeleton()
+	local module = SKELETON_HANDLERS[vim.bo.filetype]
+
+	if not module then
+		vim.notify(
+			("Skel: nothing registered for filetype %q"):format(vim.bo.filetype),
+			vim.log.levels.WARN
+		)
+		return
+	end
+
+	require(module).skeleton()
+end
+
 function M.setup()
-	local group = vim.api.nvim_create_augroup("SalarIncludeFormatter", { clear = true })
+	local group = vim.api.nvim_create_augroup("EngineTools", { clear = true })
 
-	-- C/C++ include formatter
-	vim.api.nvim_create_autocmd("BufWritePre", {
-		group = group,
-		pattern = { "*.h", "*.hpp", "*.hh", "*.hxx", "*.c", "*.cc", "*.cpp", "*.cxx" },
-		callback = function(args)
-			local ft = vim.bo[args.buf].filetype
-			if ft == "typst" then return end
-			require("engine.tools.include_formatter").format(args.buf)
-		end,
+	for _, module in ipairs(TOOLKITS) do
+		require(module).setup(group)
+	end
+
+	vim.api.nvim_create_user_command("Skel", Skeleton, {
+		desc = "Insert a Skeleton for the current file type",
 	})
-
-	-- Typst auto-compile
-	local typst_job = nil
-
-	vim.api.nvim_create_autocmd("BufWritePost", {
-		group = group,
-		pattern = "*.typ",
-		callback = function(args)
-			local file = vim.api.nvim_buf_get_name(args.buf)
-			local pdf = file:gsub("%.typ$", ".pdf")
-
-			if typst_job then
-				vim.fn.jobstop(typst_job)
-			end
-
-			typst_job = vim.fn.jobstart({ "typst", "compile", file, pdf })
-		end,
-	})
-
-	-- :Skel command
-	vim.api.nvim_create_user_command("Skel", function()
-		require("engine.tools.skeleton").insert()
-	end, {})
-
-	-- :TypstPreview command
-	vim.api.nvim_create_user_command("TypstPreview", function()
-		local file = vim.fn.expand("%")
-		local pdf = file:gsub("%.typ$", ".pdf")
-		vim.fn.jobstart({ "zathura", pdf })
-	end, {})
-
-
-	require("engine.tools.cpp_extract").setup()
 end
 
 return M
