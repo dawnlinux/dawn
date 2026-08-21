@@ -33,9 +33,11 @@ const SCHEMES: &[&str] = &[
 #[derive(Parser)]
 #[command(name = "dawn-theme", version, about = "Dawn's colour engine")]
 struct Cli {
-    /// matugen config. Defaults to the one shipped with dawn-config.
-    #[arg(long, default_value = "/usr/share/dawn/config/matugen/config.toml")]
-    config: PathBuf,
+    /// matugen config. Defaults to the one belonging to whichever mode
+    /// `dawn` has this machine in — the packaged config, or the checkout's
+    /// when running `dawn dev`.
+    #[arg(long)]
+    config: Option<PathBuf>,
 
     #[command(subcommand)]
     command: Cmd,
@@ -66,6 +68,7 @@ fn fail(msg: impl AsRef<str>) -> ExitCode {
 
 fn main() -> ExitCode {
     let cli = Cli::parse();
+    let config = cli.config.unwrap_or_else(Theme::matugen_config);
     let mut theme = Theme::load();
 
     match cli.command {
@@ -130,7 +133,7 @@ fn main() -> ExitCode {
     // Render BEFORE saving. State is only recorded once matugen has actually
     // produced the templates, so a failed run leaves the previous palette in
     // place and theme.toml still describing it.
-    if let Err(e) = render::run(&theme, &cli.config) {
+    if let Err(e) = render::run(&theme, &config) {
         return fail(format!("matugen failed:\n{e}"));
     }
     if let Err(e) = theme.save() {

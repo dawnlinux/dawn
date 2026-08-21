@@ -87,6 +87,29 @@ impl Theme {
             .unwrap_or_default()
     }
 
+    /// Where the shipped matugen config lives, for whichever mode `dawn` has
+    /// this machine in.
+    ///
+    /// `dawn link` and `dawn dev` both record the config source in
+    /// `~/.config/dawn/source`, so reading it gives the right answer in both
+    /// modes with one line:
+    ///
+    ///     package   /usr/share/dawn/config  ->  /usr/share/dawn/config/matugen/config.toml
+    ///     dev       <checkout>/config       ->  <checkout>/config/matugen/config.toml
+    ///
+    /// Falling back to the packaged path when that file is absent means a
+    /// machine which has never run `dawn link` still gets a sensible default
+    /// rather than an empty path.
+    pub fn matugen_config() -> PathBuf {
+        const PACKAGED: &str = "/usr/share/dawn/config/matugen/config.toml";
+
+        std::fs::read_to_string(Theme::dir().join("source"))
+            .ok()
+            .map(|s| PathBuf::from(s.trim()).join("matugen/config.toml"))
+            .filter(|p| p.exists())
+            .unwrap_or_else(|| PathBuf::from(PACKAGED))
+    }
+
     pub fn save(&self) -> std::io::Result<()> {
         self.save_to(&Theme::dir())
     }
@@ -199,5 +222,41 @@ mod shape {
         println!("{body}");
         assert!(body.contains("kind = \"wallpaper\""));
         assert!(body.contains("scheme = \"scheme-monochrome\""));
+    }
+}
+
+#[cfg(test)]
+mod config_resolution {
+    use super::*;
+
+    #[test]
+    fn falls_back_to_the_packaged_path_when_no_source_is_recorded() {
+        // A machine that has never run `dawn link` still gets a real default
+        // rather than an empty path.
+        let dir = std::env::temp_dir().join("dawn-theme-cfgres-none");
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        unsafe { std::env::set_var("XDG_CONFIG_HOME", &dir) };
+        assert_eq!(
+            Theme::matugen_config(),
+            PathBuf::from("/usr/share/dawn/config/matugen/config.toml")
+        );
+    }
+
+    #[test]
+    fn uses_the_recorded_source_when_the_config_is_actually_there() {
+        let dir = std::env::temp_dir().join("dawn-theme-cfgres-dev");
+        let _ = std::fs::remove_dir_all(&dir);
+        let checkout = dir.join("checkout/config");
+        std::fs::create_dir_all(checkout.join("matugen")).unwrap();
+        std::fs::write(checkout.join("matugen/config.toml"), "[config]\n").unwrap();
+        std::fs::create_dir_all(dir.join("dawn")).unwrap();
+        std::fs::write(dir.join("dawn/source"), format!("{}\n", checkout.display())).unwrap();
+
+        unsafe { std::env::set_var("XDG_CONFIG_HOME", &dir) };
+        assert_eq!(
+            Theme::matugen_config(),
+            checkout.join("matugen/config.toml")
+        );
     }
 }
