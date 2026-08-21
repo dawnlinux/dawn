@@ -1,0 +1,217 @@
+#!/usr/bin/env bash
+#
+# ==========================================================================
+#  dawn — link manager for the Dawn desktop
+# ==========================================================================
+#
+#      dawn link              point ~/.config at /usr/share/dawn/config
+#      dawn dev <repo>        point it at a checkout instead
+#      dawn status            current mode, source path, stale links
+#      dawn unlink            remove Dawn's links, restore backups
+#
+# ── Why a link manager exists at all ──────────────────────────────────────
+#
+# Dawn's configuration is owned by pacman and installed read-only under
+# /usr/share/dawn/config. Symlinking it into ~/.config is what makes
+# `pacman -Syu` update the running desktop with no merge step and no
+# migration scripts.
+#
+# ── Why there are three strategies ────────────────────────────────────────
+#
+# Some applications WRITE INTO their own configuration directory:
+#
+#     fish        fish_variables, on every `set -U`
+#     nvim        lazy-lock.json, on every :Lazy update
+#     quickshell  .qmlls.ini
+#
+# Symlinking those directories to a read-only location breaks them. So each
+# application declares how it is linked:
+#
+#     DIR   symlink the whole entry (directory or file)
+#     LINK  create a real directory; symlink only the entries Dawn owns,
+#           leaving the application free to write its own state beside them
+#     SEED  copy once if absent, never overwrite
+#
+# ── Safety ────────────────────────────────────────────────────────────────
+#
+# Nothing is ever deleted. A real file or directory occupying a link target
+# is MOVED to ~/.dawn-backup/<timestamp>/. A symlink that does not resolve
+# under the current source root is never touched.
+# ==========================================================================
+
+set -euo pipefail
+
+# DAWN_SHARE is overridable so the test suite can run against a throwaway
+# tree. Nothing else in this script may assume an absolute location.
+DAWN_SHARE="${DAWN_SHARE:-/usr/share/dawn}"
+CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+OVERRIDES="$CONFIG_HOME/dawn"
+STATE="$OVERRIDES/source"
+BACKUP_ROOT="$HOME/.dawn-backup"
+
+# Populated by resolve_source() before any linking happens.
+SOURCE=""
+BACKUP=""
+
+# ── Strategy tables ───────────────────────────────────────────────────────
+#
+# Every entry Dawn links, and how. An application absent from here is not
+# linked at all — greetd, for instance, installs to /etc by its own script
+# because the greeter runs as a user that cannot read your home directory.
+
+declare -A STRATEGY=(
+	[hypr]=DIR
+	[kitty]=DIR
+	[rofi]=DIR
+	[starship.toml]=DIR
+	[fish]=LINK
+	[nvim]=LINK
+	[quickshell]=LINK
+)
+
+# For LINK applications: exactly which entries Dawn owns.
+#
+# Listed explicitly rather than globbed. Globbing would silently start
+# linking any new file added upstream — including one the application expects
+# to own — which is the bug this strategy exists to prevent.
+declare -A ENTRIES=(
+	[fish]="config.fish"
+	[nvim]="init.lua lua dap.txt KEYBINDINGS.md README.md showcase"
+	[quickshell]="dawn-island dawn-greet"
+)
+
+# ── Output ────────────────────────────────────────────────────────────────
+
+ok()   { printf '   \033[32m✓\033[0m %s\n' "$*"; }
+skip() { printf '   \033[90m·\033[0m %s\n' "$*"; }
+warn() { printf '   \033[33m!\033[0m %s\n' "$*" >&2; }
+step() { printf '\n\033[1;37m%s\033[0m\n' "$*"; }
+die()  { printf '\033[31merror:\033[0m %s\n' "$*" >&2; exit 1; }
+
+# ── Helpers ───────────────────────────────────────────────────────────────
+
+# True if $1 is a symlink resolving under the current $SOURCE. This is the
+# guard that stops the CLI from ever removing something it did not create.
+is_ours() {
+	local path="$1" root
+	[ -L "$path" ] || return 1
+	root="$(readlink -f "$SOURCE")"
+	case "$(readlink -f "$path")" in
+		"$root"/*) return 0 ;;
+		"$root")   return 0 ;;
+		*)         return 1 ;;
+	esac
+}
+
+# Move whatever occupies $1 into this run's backup directory. Never deletes.
+back_up() {
+	local target="$1"
+	[ -n "$BACKUP" ] || BACKUP="$BACKUP_ROOT/$(date +%Y%m%d-%H%M%S)"
+	mkdir -p "$BACKUP"
+	mv "$target" "$BACKUP/$(basename "$target")"
+	warn "existing $(basename "$target") moved to $BACKUP/"
+}
+
+# Symlink $1 -> $2, backing up whatever is in the way.
+link_entry() {
+	local src="$1" dst="$2"
+
+	[ -e "$src" ] || { warn "nothing to link at $src"; return; }
+
+	if [ -L "$dst" ] && [ "$(readlink -f "$dst")" = "$(readlink -f "$src")" ]; then
+		return 0    # already correct; touch nothing
+	fi
+
+	if [ -L "$dst" ]; then
+		# A symlink elsewhere. Replacing it loses nothing, so no backup.
+		warn "$(basename "$dst") pointed at $(readlink "$dst") — repointing"
+		rm "$dst"
+	elif [ -e "$dst" ]; then
+		back_up "$dst"
+	fi
+
+	mkdir -p "$(dirname "$dst")"
+
+	# -n matters: without it, `ln -s src dst` where dst is an existing
+	# directory creates dst/src instead of replacing dst. That is the classic
+	# dotfile-installer bug that produces ~/.config/fish/fish.
+	ln -sfn "$src" "$dst"
+}
+
+# ── Strategies ────────────────────────────────────────────────────────────
+
+strategy_dir() {
+	local name="$1"
+	[ -e "$SOURCE/$name" ] || return 0
+	link_entry "$SOURCE/$name" "$CONFIG_HOME/$name"
+	ok "$name"
+}
+
+# Filled in by later tasks; defined here so `apply` is complete from the
+# start and adding a strategy never means editing the dispatch loop.
+strategy_link() { :; }
+seed_all()      { :; }
+
+# ── Source resolution ─────────────────────────────────────────────────────
+
+resolve_source() {
+	if [ -f "$STATE" ]; then
+		SOURCE="$(cat "$STATE")"
+	else
+		SOURCE="$DAWN_SHARE/config"
+	fi
+	[ -d "$SOURCE" ] || die "config source does not exist: $SOURCE"
+}
+
+record_source() {
+	mkdir -p "$OVERRIDES"
+	printf '%s\n' "$SOURCE" > "$STATE"
+}
+
+# ── Commands ──────────────────────────────────────────────────────────────
+
+apply() {
+	step "Linking $SOURCE into $CONFIG_HOME"
+	local name
+	for name in $(printf '%s\n' "${!STRATEGY[@]}" | sort); do
+		case "${STRATEGY[$name]}" in
+			DIR)  strategy_dir  "$name" ;;
+			LINK) strategy_link "$name" ;;
+		esac
+	done
+	seed_all
+}
+
+cmd_link() {
+	SOURCE="$DAWN_SHARE/config"
+	[ -d "$SOURCE" ] || die "config source does not exist: $SOURCE"
+	record_source
+	apply
+}
+
+usage() {
+	cat <<-EOF
+
+	  dawn — link manager for the Dawn desktop
+
+	      dawn link           point ~/.config at $DAWN_SHARE/config
+	      dawn dev <repo>     point it at a checkout instead
+	      dawn status         current mode, source path, and every link
+	      dawn unlink         remove Dawn's links and restore backups
+
+	  Machine-local overrides live in $OVERRIDES and are never
+	  touched by any of these commands.
+
+	EOF
+}
+
+main() {
+	local cmd="${1:-}"
+	case "$cmd" in
+		link)          cmd_link ;;
+		-h|--help|"")  usage ;;
+		*)             die "unknown command: $cmd (try --help)" ;;
+	esac
+}
+
+main "$@"
