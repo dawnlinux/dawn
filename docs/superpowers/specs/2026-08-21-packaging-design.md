@@ -248,6 +248,22 @@ Triggered by pushing a tag:
 
 `pkgver` derives from the tag, so tagging is the only release action.
 
+**The pipeline has a second consumer.** GitHub Pages is not the only thing that
+needs these packages: the installer ISO (next stage) has to bake an *offline*
+pacman repository onto the image, holding the three Dawn packages plus their
+resolved dependency closure. That is what lets an ISO install in under two
+minutes — the packages are on the USB stick, and `pacstrap` never touches the
+network.
+
+So the release job must expose the built packages as a reusable artifact, not
+only commit them to `dawnlinux/repo`. Concretely: publish the signed
+`.pkg.tar.zst` files as a workflow artifact that a later ISO build can download
+and feed to `repo-add` locally.
+
+This does not change any package or any link strategy. It is recorded here
+because writing the workflow as if Pages were the only target would need
+reworking the moment the ISO exists.
+
 ### `install.sh` becomes a bootstrap
 
 The current installer's job splits in two. Linking moves into the CLI; what
@@ -311,7 +327,12 @@ silently eats someone's configuration.
 
 **Out of scope**
 
-- an archiso ISO — the next stage, and it depends on this one
+- an archiso ISO with a graphical installer — the next stage. It depends on
+  this one: its core step is `pacstrap /mnt base linux linux-firmware dawn`,
+  which requires the `dawn` package to exist. Building it first would mean
+  hand-rolling config installation into the ISO and discarding that work once
+  packaging lands. The only accommodation made for it here is the reusable
+  package artifact described under *Release pipeline*.
 - `dawn greeter enable|disable` CLI wrappers; the existing
   `config/greetd/install.sh` ships as-is and keeps working
 - automatic migration between Dawn releases; D1 makes it unnecessary for
