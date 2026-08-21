@@ -36,35 +36,64 @@ trust, or to break an install halfway through.
 ## Install
 
 ```sh
-git clone https://github.com/jhayonline/dawn
+git clone https://github.com/dawnlinux/dawn
 cd dawn
 ./install.sh
 ```
 
-See exactly what it will do to your machine first:
+See exactly what it will do first with `./install.sh --dry-run`.
+
+The bootstrap does four things and nothing else:
+
+1. imports and locally signs the Dawn package signing key
+2. adds the `[dawn]` repository to `/etc/pacman.conf`
+3. `pacman -Sy dawn`
+4. `dawn link`
+
+After that, **Dawn updates like everything else on the system**:
 
 ```sh
-./install.sh --dry-run
+sudo pacman -Syu
 ```
 
-The installer:
+### Doing it by hand
 
-1. installs the packages in [`install/packages.txt`](install/packages.txt)
-2. symlinks `config/<name>` into `~/.config/<name>`
-3. seeds your machine-local override files from their templates
-4. creates `~/Pictures/Wallpapers`
-5. offers to make fish your login shell
+```sh
+sudo pacman-key --recv-keys C36BACF174290B6ED5456879BCB1F6ACA2DD7A59
+sudo pacman-key --lsign-key C36BACF174290B6ED5456879BCB1F6ACA2DD7A59
+```
 
-It never deletes anything. A real file or directory sitting where a symlink
-needs to go is **moved** to `~/.dawn-backup/<timestamp>/`, and `--uninstall`
-puts it back. It is idempotent, so re-running it after `git pull` is the
-supported way to pick up changes.
+```ini
+# /etc/pacman.conf
+[dawn]
+SigLevel = Required DatabaseOptional
+Server = https://dawnlinux.github.io/repo/$arch
+```
 
-| Flag | Effect |
+```sh
+sudo pacman -Sy dawn && dawn link
+```
+
+Packages are signed and `SigLevel = Required`, so pacman refuses anything not
+signed by that key.
+
+### The `dawn` command
+
+Configuration is installed to `/usr/share/dawn/config` and symlinked into
+`~/.config`, which is what lets `pacman -Syu` update the running desktop with
+no merge step. `dawn` owns those links:
+
+| Command | Effect |
 |---|---|
-| `--dry-run` | print every action, change nothing |
-| `--no-packages` | skip `pacman`, link config only |
-| `--uninstall` | remove Dawn's symlinks, restore backups |
+| `dawn link` | point `~/.config` at the packaged config |
+| `dawn dev <repo>` | point it at a checkout instead, for hacking on Dawn |
+| `dawn status` | which mode you are in, and every link |
+| `dawn unlink` | remove Dawn's links and restore backups |
+
+Nothing is ever deleted — anything occupying a link target is moved to
+`~/.dawn-backup/<timestamp>/`.
+
+How all of this fits together: [`docs/packaging.md`](docs/packaging.md).
 
 ## The login screen
 
@@ -90,11 +119,12 @@ gitignored, seeded on install, and loaded last so they override everything:
 
 | File | For |
 |---|---|
-| `~/.config/hypr/modules/local.lua` | monitor modes, GPU driver hints, vendor keybinds, per-host autostart |
-| `~/.config/fish/local.fish` | personal aliases, extra `PATH` entries, secrets |
+| `~/.config/dawn/local.lua` | monitor modes, GPU driver hints, vendor keybinds, per-host autostart |
+| `~/.config/dawn/local.fish` | personal aliases, extra `PATH` entries, secrets |
 
-Both have a heavily commented `.example` next to them. Because they are
-gitignored, `git pull` will never conflict with your hardware quirks — and
+Both are seeded from `/usr/share/dawn/examples/` on your first `dawn link`
+and never overwritten afterwards. They live in `~/.config/dawn/`, outside
+every symlink Dawn creates, so `pacman -Syu` can never touch them — and
 because they load last, you never have to fork a shipped file to change one
 line.
 
@@ -104,13 +134,13 @@ Hardware-specific settings belong there, **not** in the shared modules. A
 ## What's in here
 
 ```
-install.sh                    the installer
+install.sh                    the bootstrap — adds the repo, installs Dawn
 install/packages.txt          every dependency, with a reason for each
 
 config/
   hypr/                       Hyprland, split into modules by concern
-    hyprland.lua              entry point; requires local.lua last
-    modules/local.lua.example the machine-local override template
+    hyprland.lua              entry point; loads ~/.config/dawn/local.lua last
+    modules/                  binds, monitors, decorations, autostart, ...
   quickshell/
     dawn-island/              the shell — bar, launcher, notifications,
                               media, clipboard, wallpapers, session menu
@@ -118,10 +148,24 @@ config/
   greetd/                     greetd config + its own reversible installer
   fish/  kitty/  rofi/  nvim/ shell, terminal, clipboard picker, editor
 
+examples/                     seed sources for ~/.config/dawn
+
+packaging/
+  PKGBUILD                    builds dawn, dawn-config, dawn-typist
+  dawn                        the link manager installed to /usr/bin/dawn
+  release.sh                  build → sign → assemble the pacman repo
+  check-depends.sh            fails the build if deps drift from the manifest
+
+tests/                        bats suites for the CLI and the drift check
+
 tools/
   typist/                     a lightweight typing-speed test
 
 assets/                       branding, and wallpapers to seed on install
+
+docs/
+  packaging.md                how the packaging and link system works
+  superpowers/                design specs and implementation plans
 ```
 
 Keybindings live in
