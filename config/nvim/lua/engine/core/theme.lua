@@ -2,7 +2,10 @@ local colorschemes = require("engine.core.colorschemes")
 
 local M = {}
 
-local default_scheme = "koda"
+-- Dawn's own scheme, generated from the wallpaper by dawn-theme, so the
+-- editor matches the rest of the desktop out of the box. It is a normal entry
+-- in the picker; `:Theme koda` still switches away and persists that choice.
+local default_scheme = "dawn"
 local state_file = vim.fs.joinpath(vim.fn.stdpath("state"), "engine-theme")
 
 local function read_saved()
@@ -100,6 +103,31 @@ function M.select()
 	end)
 end
 
+--- Persist a colourscheme chosen with vim's own `:colorscheme` command.
+---
+--- `M.apply` saves; the bare `:colorscheme` does not, because it is vim's
+--- command and knows nothing about this module. That difference is invisible
+--- until you restart and find your choice gone — so the ColorScheme event is
+--- watched instead, and any scheme from the registry is remembered however it
+--- was selected.
+---
+--- Guarded twice: nothing is written while nvim is still starting, so the
+--- restore below cannot re-save what it just read, and unknown names are
+--- ignored so a plugin setting a scheme transiently cannot overwrite a real
+--- preference.
+local function persist_manual_changes()
+	vim.api.nvim_create_autocmd("ColorScheme", {
+		callback = function(ev)
+			if vim.v.vim_did_enter == 0 then
+				return
+			end
+			if vim.tbl_contains(M.names(), ev.match) then
+				save(ev.match)
+			end
+		end,
+	})
+end
+
 local function create_commands()
 	local function complete(arg_lead)
 		return vim.tbl_filter(function(name)
@@ -130,6 +158,7 @@ end
 
 function M.setup()
 	create_commands()
+	persist_manual_changes()
 
 	local saved = read_saved()
 
