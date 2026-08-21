@@ -26,3 +26,19 @@
 [templates.island]
 input_path  = '~/.config/dawn/templates/dawn-colors.json'
 output_path = '~/.config/dawn/generated/colors.json'
+
+# The terminal. kitty.conf includes this by absolute path; kitty's `include`
+# applies expanduser and expandvars, so `~` resolves.
+[templates.kitty]
+input_path  = '~/.config/dawn/templates/kitty-colors.conf'
+output_path = '~/.config/dawn/generated/kitty-colors.conf'
+
+# The clipboard picker. rofi's `@import` accepts `~` and absolute paths.
+[templates.rofi]
+input_path  = '~/.config/dawn/templates/rofi-colors.rasi'
+output_path = '~/.config/dawn/generated/rofi-colors.rasi'
+
+# Window borders and shadow. decorations.lua dofile()s the result.
+[templates.hyprland]
+input_path  = '~/.config/dawn/templates/hyprland-colors.lua'
+output_path = '~/.config/dawn/generated/hyprland-colors.lua'
