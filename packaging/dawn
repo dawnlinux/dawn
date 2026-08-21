@@ -147,10 +147,42 @@ strategy_dir() {
 	ok "$name"
 }
 
-# Filled in by later tasks; defined here so `apply` is complete from the
+# A real directory containing symlinks to the entries Dawn owns.
+#
+# Used where the application writes into its own config directory:
+# fish writes fish_variables, nvim writes lazy-lock.json, quickshell writes
+# .qmlls.ini. Symlinking the directory itself to a read-only location makes
+# all three fail, so only the individual entries are linked and the directory
+# stays writable.
+strategy_link() {
+	local name="$1"
+	local dir="$CONFIG_HOME/$name"
+	local linked=0 entry
+
+	[ -d "$SOURCE/$name" ] || return 0
+
+	# If a previous run (or another tool) left a symlink here, it has to
+	# become a real directory before anything can be written inside it.
+	if [ -L "$dir" ]; then
+		warn "$name was a symlink — replacing with a real directory"
+		rm "$dir"
+	fi
+	mkdir -p "$dir"
+
+	for entry in ${ENTRIES[$name]}; do
+		# Silently skip entries this source does not carry, so the table can
+		# list optional files without every install warning about them.
+		[ -e "$SOURCE/$name/$entry" ] || continue
+		link_entry "$SOURCE/$name/$entry" "$dir/$entry"
+		linked=$((linked + 1))
+	done
+
+	ok "$name ($linked entries)"
+}
+
+# Filled in by a later task; defined here so `apply` is complete from the
 # start and adding a strategy never means editing the dispatch loop.
-strategy_link() { :; }
-seed_all()      { :; }
+seed_all() { :; }
 
 # ── Source resolution ─────────────────────────────────────────────────────
 

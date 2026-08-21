@@ -76,3 +76,56 @@ teardown() {
     [ "$(readlink -f "$XDG_CONFIG_HOME/rofi")" = "$(readlink -f "$DAWN_SHARE/config/rofi")" ]
     [ ! -d "$HOME/.dawn-backup" ]
 }
+
+# ── LINK strategy ─────────────────────────────────────────────────────────
+
+@test "LINK app gets a real directory, not a symlink" {
+    mkdir -p "$DAWN_SHARE/config/fish"
+    echo 'set fish_greeting' > "$DAWN_SHARE/config/fish/config.fish"
+
+    run "$DAWN" link
+    [ "$status" -eq 0 ]
+    [ -d "$XDG_CONFIG_HOME/fish" ]
+    [ ! -L "$XDG_CONFIG_HOME/fish" ]
+}
+
+@test "LINK app symlinks only the listed entries" {
+    mkdir -p "$DAWN_SHARE/config/fish"
+    echo 'set fish_greeting' > "$DAWN_SHARE/config/fish/config.fish"
+    echo 'not ours'          > "$DAWN_SHARE/config/fish/stray.fish"
+
+    run "$DAWN" link
+    [ -L "$XDG_CONFIG_HOME/fish/config.fish" ]
+    [ ! -e "$XDG_CONFIG_HOME/fish/stray.fish" ]
+}
+
+@test "LINK app leaves the directory writable for app state" {
+    mkdir -p "$DAWN_SHARE/config/fish"
+    echo 'set fish_greeting' > "$DAWN_SHARE/config/fish/config.fish"
+
+    "$DAWN" link
+    echo 'SETUVAR foo:bar' > "$XDG_CONFIG_HOME/fish/fish_variables"
+    [ -f "$XDG_CONFIG_HOME/fish/fish_variables" ]
+    [ ! -L "$XDG_CONFIG_HOME/fish/fish_variables" ]
+}
+
+@test "LINK app links subdirectories as well as files" {
+    mkdir -p "$DAWN_SHARE/config/nvim/lua"
+    echo 'return {}' > "$DAWN_SHARE/config/nvim/init.lua"
+    echo 'return {}' > "$DAWN_SHARE/config/nvim/lua/x.lua"
+
+    run "$DAWN" link
+    [ -L "$XDG_CONFIG_HOME/nvim/init.lua" ]
+    [ -L "$XDG_CONFIG_HOME/nvim/lua" ]
+    [ "$(cat "$XDG_CONFIG_HOME/nvim/lua/x.lua")" = "return {}" ]
+}
+
+@test "LINK skips entries the source does not have" {
+    mkdir -p "$DAWN_SHARE/config/quickshell/dawn-island"
+    echo '// shell' > "$DAWN_SHARE/config/quickshell/dawn-island/shell.qml"
+
+    run "$DAWN" link
+    [ "$status" -eq 0 ]
+    [ -L "$XDG_CONFIG_HOME/quickshell/dawn-island" ]
+    [ ! -e "$XDG_CONFIG_HOME/quickshell/dawn-greet" ]
+}
