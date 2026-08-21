@@ -23,12 +23,6 @@ ShellRoot {
     /// Services → island. One instance for the whole shell, not per screen.
     EventRouter {}
 
-    /// Wallpaper → accent. Named here because a QML singleton is only created
-    /// on first use and nothing else in the shell ever asks Accent for
-    /// anything — it writes to Theme and is read by no one. Without this line
-    /// it would never run.
-    readonly property color derivedAccent: Accent.derived
-
     /*
      * Driving the island from the keyboard.
      *

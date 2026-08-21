@@ -50,9 +50,6 @@ pipewire                    # audio server
 pipewire-pulse              # PulseAudio compatibility, so ordinary apps find the sink
 wireplumber                 # PipeWire session manager; `wpctl` drives the volume keys
 playerctl                   # MPRIS media keys, and the island's now-playing pane
-ffmpeg                      # samples the wallpaper down to 16x16 so Accent.qml can
-                            # pull the desktop's accent colour out of it. Without this
-                            # the whole interface stays monochrome.
 
 
 # ── Hardware control ──────────────────────────────────────────────────────

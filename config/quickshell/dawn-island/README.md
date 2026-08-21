@@ -99,99 +99,27 @@ row; no bluetooth adapter, no bluetooth row. A row that cannot do anything —
 battery is a readout — ignores all three verbs rather than closing the panel
 under you.
 
-### Wallpaper carousel
+### Colour
 
-`Super+Shift+W` unfolds the notch into a coverflow of everything in
-`~/Pictures/Wallpapers`. `←` `→` browse, `⏎` sets the centred one, `Esc` closes;
-the scroll wheel moves it a tile per notch, and clicking a tile selects it —
-clicking the one already centred is what applies it, so the pointer can never
-set a wallpaper you hadn't looked at.
+The island does not derive its own colours. `theme/Colors.qml` reads
+`~/.config/dawn/generated/colors.json`, which `dawn-theme` renders through
+matugen from the current wallpaper or a seed colour — the same palette that
+colours the terminal, the launcher and the window borders.
 
-A grid was the obvious shape and the wrong one: a grid asks you to search it,
-twelve equal tiles with none of them the subject. A carousel _has_ a subject —
-the one in the middle is the one you are choosing, and the neighbours shrink and
-fade along the path so depth does the work an outline would otherwise do alone.
-
-It opens on whatever is already on the desktop rather than at the top of the
-folder, and the applied wallpaper keeps a green check while you browse past it,
-because the selected tile and the applied tile are different things.
-
-Applying shells out to `Config.wallpaperCommand`, where `{}` is the shell-quoted
-path:
-
-```qml
-property string wallpaperDir: home + "/Pictures/Wallpapers"
-property string wallpaperCommand:
-    "awww img {} --transition-type random --transition-duration 1.2 --transition-fps 60"
+```sh
+dawn-theme wallpaper ~/Pictures/Wallpapers/lantern-line.png
+dawn-theme scheme vibrant
 ```
 
-`random` is deliberate — awww picks a different wipe, grow or wave each time, so
-changing wallpaper never looks routine. Swap in `fade` for something calmer, or
-point the command at `swww` / `hyprpaper` if you change daemons. The folder is
-read live, so dropping a new image in makes it appear without restarting
-anything, and only the directory itself is scanned — no recursion, because a
-wallpaper folder with subfolders is a photo library and this is not a file
-manager.
+`FileView` watches that file, so the island repaints the moment it changes; it
+is never restarted. The defaults written into `Colors.qml` are the palette a
+fresh install runs on, before `dawn-theme` has been invoked at all.
 
-Thumbnails are decoded at twice the tile size and no larger; a folder of 4K
-photographs is the normal case and loading them at native resolution to draw
-them 176px wide is how a wallpaper picker ends up eating a gigabyte.
+`positive` and `warning` are deliberately excluded from derivation: Material
+You has no success or warning role, and a low-battery warning that changes hue
+with the wallpaper has stopped communicating urgency.
 
-### The accent follows the wallpaper
-
-Setting a wallpaper retints the shell. The launcher's selection, the focused
-workspace dot, the status panel's marker and the rest of `Theme.accent`
-crossfade to a colour taken from the image, over `Config.accentDuration`.
-
-**The wallpaper chooses the hue. Dawn chooses everything else.**
-
-That split is the whole design. Lifting a colour out of an image wholesale
-gives you whatever the image happened to contain — a muddy olive from a forest
-photo, a near-black from a dark one, something acid from a poster — and half of
-those cannot be read on a black island beside `#f2f2f2` text. So only the hue
-survives the trip; saturation and lightness are fixed in `Config`:
-
-```qml
-property real accentSaturation: 0.52
-property real accentLightness:  0.80
-```
-
-Tuned so a derived accent lands in the same family as dawn's own pink
-(`#e8b9e0`). Every wallpaper ends up somewhere in that family, and the shell
-stays recognisably itself while still answering to what is behind it.
-
-A wallpaper with no colour in it gets no colour out. A black-and-white
-photograph scores exactly zero and keeps `Theme.accentBase`, rather than being
-assigned an invented hue from sensor noise.
-
-#### How the colour is picked
-
-Nothing in the shell decodes an image. `ffmpeg` scales the wallpaper to 16×16
-in its own process and exits; the shell only ever sees 768 bytes, which is why
-sampling a 4K photograph is free. `od` turns those bytes into decimal text,
-because `StdioCollector` reads text and raw RGB contains NULs.
-
-Hues are then voted for in buckets rather than averaged, because **a mean over
-hue is always wrong**: hue is an angle, so red at 350° and red at 10° average to
-cyan, and even without the wraparound the mean of a blue sky and an orange
-sunset is the grey between them. Every pixel votes for one of 24 buckets, the
-heaviest bucket wins — scored together with its two neighbours, so a hue on a
-boundary cannot split its own vote — and only inside the winner is a mean taken,
-as a circular mean, the one form that survives the 360°/0° seam.
-
-Votes are weighted by **chroma squared**. Chroma alone lets a large field of
-nearly-grey outvote a small vivid subject. Higher powers are unstable: measured
-across a folder of eleven wallpapers, squaring agrees with linear on every
-single one, while cubing flips one image from blue to amber and a fourth power
-flips another from teal to red. Squared is the strongest weighting that still
-picks the colour a person would.
-
-Near-black and blown-out pixels are skipped entirely. Their hue is real but
-worthless — a couple of bits of noise away from anywhere on the wheel.
-
-Turn the whole thing off with `Config.deriveAccentFromWallpaper = false`, and
-the accent is the monochrome `#f2f2f2` it was before. Without `ffmpeg`
-installed, the same thing happens silently.
+See [`docs/theming.md`](../../../docs/theming.md).
 
 ### Notification centre
 
@@ -290,7 +218,6 @@ Everything below was already present on this machine; nothing was installed.
 | `bluez`          | bluetooth adapter and device state      | optional                      |
 | `awww`           | setting the wallpaper from the carousel | optional                      |
 | `upower`         | battery                                 | optional                      |
-| `ffmpeg`         | sampling the wallpaper for the accent   | optional                      |
 | Inter            | UI typeface                             | falls back to sans-serif      |
 | JetBrainsMono NF | icon glyphs where no vector icon exists | falls back to a missing glyph |
 
@@ -352,8 +279,6 @@ modules/             one file per thing the island can show
 services/            facts about the system; none of them know the island exists
   IslandState.qml      the state machine — priority, expiry, payloads
   EventRouter.qml      the only place that turns a fact into "show this"
-  Accent.qml           wallpaper → Theme.accent; the only service that
-                       writes to the theme rather than announcing a fact
   Audio, Brightness, Clipboard, Clock, Hypr, Media, Net, Notifs, Power
 
 theme/               Theme (colour, metrics), Typography, Anim, Glyphs

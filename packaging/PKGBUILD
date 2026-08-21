@@ -89,7 +89,6 @@ _dawn_depends=(
 	pipewire-pulse
 	wireplumber
 	playerctl
-	ffmpeg
 
 	# Hardware control
 	brightnessctl

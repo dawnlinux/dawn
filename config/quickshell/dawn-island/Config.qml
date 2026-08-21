@@ -121,6 +121,10 @@ Singleton {
     /// Master switch — set false for a completely static island.
     property bool animationsEnabled: true
 
+    /// Crossfade from the old accent to the new one when dawn-theme writes a
+    /// new palette. Follows animationsEnabled like every other duration.
+    property int accentDuration: 800
+
     /// ── Shape morph ──
     /// The island's width/height are driven by a real spring rather than a
     /// duration, so growing and shrinking are both physically correct and the
@@ -394,53 +398,6 @@ Singleton {
     /// awww, so a plain file it *can* read is the only way across.
     /// Empty disables the write. See dawn-greet/README.md.
     property string wallpaperPointer: "/var/lib/dawn/wallpaper"
-
-    // ─────────────────────────────────────────────────────────────────────
-    //  Accent / wallpaper integration
-    // ─────────────────────────────────────────────────────────────────────
-
-    /// Derive the accent colour from the current wallpaper. Purely optional —
-    /// everything works without it. Needs ffmpeg; without it the accent simply
-    /// stays Theme.accentBase. See services/Accent.qml.
-    property bool deriveAccentFromWallpaper: true
-
-    /// Where to look for the wallpaper. Empty == whatever the island last
-    /// applied, which it learns from the daemon at startup.
-    property string wallpaperPath: ""
-
-    /// The wallpaper contributes a hue and nothing else; these two decide how
-    /// loud it is allowed to be. Tuned so a derived accent lands in the same
-    /// family as dawn's own pink (#e8b9e0) and stays legible on a black island
-    /// beside #f2f2f2 text. Past about 0.6 saturation it starts to fight the
-    /// monochrome shell rather than accent it.
-    property real accentSaturation: 0.52
-    property real accentLightness: 0.80
-
-    /// Edge of the square the wallpaper is scaled to before its hue is read.
-    /// 16 is 256 pixels: plenty to find a dominant hue, small enough that the
-    /// arithmetic is free. Larger mostly adds noise.
-    property int accentSampleSize: 16
-
-    /// Pixels outside this brightness band are skipped. Their hue is real but
-    /// unstable — a bit of noise away from anywhere on the wheel.
-    property real accentMinValue: 0.10
-    property real accentMaxValue: 0.97
-
-    /// Below this chroma a pixel is grey, and grey has no hue to vote with.
-    property real accentMinChroma: 0.04
-
-    /// Mean chroma-weight per pixel below which the image is treated as having
-    /// no colour at all, keeping accentBase. Monochrome scores exactly 0.
-    property real accentMinStrength: 0.001
-
-    /// How long to wait after the wallpaper changes before sampling it.
-    /// Applying writes the file, tells the daemon and republishes the pointer
-    /// all at once, and this outlasts the lot.
-    property int accentSampleDelay: 400
-
-    /// Crossfade from the old accent to the new one. Follows
-    /// animationsEnabled like every other duration.
-    property int accentDuration: 800
 
     // ─────────────────────────────────────────────────────────────────────
     //  Integration
