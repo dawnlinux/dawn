@@ -165,3 +165,88 @@ teardown() {
     echo '{"c":"d"}' > "$XDG_CONFIG_HOME/nvim/lazy-lock.json"
     [ "$(cat "$XDG_CONFIG_HOME/nvim/lazy-lock.json")" = '{"c":"d"}' ]
 }
+
+# ── dev / status / unlink ─────────────────────────────────────────────────
+
+@test "dev points the links at a checkout" {
+    mkdir -p "$TESTDIR/checkout/config/kitty"
+    echo 'font_size 99' > "$TESTDIR/checkout/config/kitty/kitty.conf"
+
+    run "$DAWN" dev "$TESTDIR/checkout"
+    [ "$status" -eq 0 ]
+    [ "$(cat "$XDG_CONFIG_HOME/kitty/kitty.conf")" = "font_size 99" ]
+}
+
+@test "dev rejects a path with no config directory" {
+    mkdir -p "$TESTDIR/not-a-checkout"
+    run "$DAWN" dev "$TESTDIR/not-a-checkout"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"config"* ]]
+}
+
+@test "status reports package mode after link" {
+    "$DAWN" link
+    run "$DAWN" status
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"package"* ]]
+    [[ "$output" == *"$DAWN_SHARE/config"* ]]
+}
+
+@test "status reports dev mode after dev" {
+    mkdir -p "$TESTDIR/checkout/config/kitty"
+    echo 'x' > "$TESTDIR/checkout/config/kitty/kitty.conf"
+    "$DAWN" dev "$TESTDIR/checkout"
+
+    run "$DAWN" status
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"dev"* ]]
+    [[ "$output" == *"$TESTDIR/checkout/config"* ]]
+}
+
+@test "status surfaces a recorded local.lua error" {
+    "$DAWN" link
+    mkdir -p "$XDG_CONFIG_HOME/dawn"
+    echo 'local.lua could not be read: boom' > "$XDG_CONFIG_HOME/dawn/last-error"
+
+    run "$DAWN" status
+    [[ "$output" == *"boom"* ]]
+}
+
+@test "unlink removes Dawn's links" {
+    "$DAWN" link
+    [ -L "$XDG_CONFIG_HOME/hypr" ]
+
+    run "$DAWN" unlink
+    [ "$status" -eq 0 ]
+    [ ! -e "$XDG_CONFIG_HOME/hypr" ]
+}
+
+@test "unlink restores a backup byte-for-byte" {
+    mkdir -p "$XDG_CONFIG_HOME/kitty"
+    echo "mine" > "$XDG_CONFIG_HOME/kitty/kitty.conf"
+
+    "$DAWN" link
+    "$DAWN" unlink
+
+    [ -d "$XDG_CONFIG_HOME/kitty" ]
+    [ ! -L "$XDG_CONFIG_HOME/kitty" ]
+    [ "$(cat "$XDG_CONFIG_HOME/kitty/kitty.conf")" = "mine" ]
+}
+
+@test "unlink leaves user overrides alone" {
+    echo '-- lua example' > "$DAWN_SHARE/examples/local.lua"
+    "$DAWN" link
+    "$DAWN" unlink
+    [ -f "$XDG_CONFIG_HOME/dawn/local.lua" ]
+}
+
+@test "unlink does not touch a foreign symlink" {
+    mkdir -p "$TESTDIR/elsewhere"
+    "$DAWN" link
+    rm "$XDG_CONFIG_HOME/rofi"
+    ln -s "$TESTDIR/elsewhere" "$XDG_CONFIG_HOME/rofi"
+
+    "$DAWN" unlink
+    [ -L "$XDG_CONFIG_HOME/rofi" ]
+    [ "$(readlink -f "$XDG_CONFIG_HOME/rofi")" = "$(readlink -f "$TESTDIR/elsewhere")" ]
+}

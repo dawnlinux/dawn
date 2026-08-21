@@ -252,6 +252,114 @@ cmd_link() {
 	apply
 }
 
+cmd_dev() {
+	local repo="${1:-}"
+	[ -n "$repo" ] || die "usage: dawn dev <repo>   (the checkout root, not its config/ directory)"
+
+	# The argument is the checkout ROOT — the directory the user cloned —
+	# because that is what they have in their head, and because the CLI can
+	# read install/packages.txt from the same place.
+	repo="$(cd "$repo" 2>/dev/null && pwd)" || die "no such directory: $1"
+	[ -d "$repo/config" ] || die "$repo has no config/ directory — is it a Dawn checkout?"
+
+	SOURCE="$repo/config"
+	record_source
+	apply
+
+	printf '\n  Now in \033[1;37mdev\033[0m mode. Edits in %s take effect immediately.\n' "$repo"
+	printf '  Run \033[1;37mdawn link\033[0m to go back to the packaged config.\n\n'
+}
+
+cmd_status() {
+	resolve_source
+
+	local mode="dev"
+	[ "$SOURCE" = "$DAWN_SHARE/config" ] && mode="package"
+
+	printf '\n  mode:   \033[1;37m%s\033[0m\n' "$mode"
+	printf '  source: %s\n\n' "$SOURCE"
+
+	# hyprland.lua records a broken local.lua here, because it has no other
+	# working channel — no hl.notify, and print() reaches no log. Surfacing
+	# it is the whole reason the file exists.
+	if [ -s "$OVERRIDES/last-error" ]; then
+		printf '   \033[31m✗\033[0m local.lua  %s\n\n' "$(cat "$OVERRIDES/last-error")"
+	fi
+
+	# Report every managed entry, so "I edited the repo and nothing changed"
+	# always has a visible cause.
+	local name dst
+	for name in $(printf '%s\n' "${!STRATEGY[@]}" | sort); do
+		dst="$CONFIG_HOME/$name"
+		if [ ! -e "$dst" ] && [ ! -L "$dst" ]; then
+			printf '   \033[33m!\033[0m %-14s missing\n' "$name"
+		elif [ "${STRATEGY[$name]}" = "LINK" ]; then
+			printf '   \033[32m✓\033[0m %-14s %s entries\n' "$name" \
+				"$(find "$dst" -maxdepth 1 -type l 2>/dev/null | wc -l)"
+		elif is_ours "$dst"; then
+			printf '   \033[32m✓\033[0m %-14s linked\n' "$name"
+		else
+			printf '   \033[33m!\033[0m %-14s not ours (%s)\n' "$name" \
+				"$(readlink "$dst" 2>/dev/null || echo 'real file')"
+		fi
+	done
+	printf '\n'
+}
+
+cmd_unlink() {
+	resolve_source
+	step "Removing Dawn's links"
+
+	local name dst entry
+	for name in $(printf '%s\n' "${!STRATEGY[@]}" | sort); do
+		dst="$CONFIG_HOME/$name"
+
+		if [ "${STRATEGY[$name]}" = "LINK" ]; then
+			# Remove only the entries Dawn linked, then the directory itself
+			# if that emptied it. Anything the app wrote there stays.
+			[ -d "$dst" ] || continue
+			for entry in ${ENTRIES[$name]}; do
+				is_ours "$dst/$entry" && rm "$dst/$entry"
+			done
+			if rmdir "$dst" 2>/dev/null; then
+				ok "$name (removed, was empty)"
+			else
+				ok "$name (links removed, app state kept)"
+			fi
+		elif is_ours "$dst"; then
+			rm "$dst"
+			ok "$name"
+		else
+			skip "$name (not a Dawn link)"
+		fi
+	done
+
+	step "Restoring backups"
+
+	local latest item
+	latest="$(find "$BACKUP_ROOT" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | sort | tail -1)"
+
+	if [ -z "$latest" ]; then
+		skip "no backups in $BACKUP_ROOT"
+	else
+		for item in "$latest"/*; do
+			[ -e "$item" ] || continue
+			dst="$CONFIG_HOME/$(basename "$item")"
+			if [ -e "$dst" ]; then
+				warn "$(basename "$item") not restored — something is already at $dst"
+			else
+				mv "$item" "$dst"
+				ok "restored $(basename "$item")"
+			fi
+		done
+		rmdir "$latest" 2>/dev/null || true
+	fi
+
+	# ~/.config/dawn is deliberately left alone. Those are the user's own
+	# overrides; uninstalling Dawn is not a reason to delete them.
+	printf '\n  Your overrides in %s were left untouched.\n\n' "$OVERRIDES"
+}
+
 usage() {
 	cat <<-EOF
 
@@ -272,6 +380,9 @@ main() {
 	local cmd="${1:-}"
 	case "$cmd" in
 		link)          cmd_link ;;
+		dev)           shift; cmd_dev "$@" ;;
+		status)        cmd_status ;;
+		unlink)        cmd_unlink ;;
 		-h|--help|"")  usage ;;
 		*)             die "unknown command: $cmd (try --help)" ;;
 	esac
