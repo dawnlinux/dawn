@@ -121,6 +121,7 @@ Item {
     function componentFor(state) {
         switch (state) {
         case "launcher":     return launcherView;
+        case "keybinds":     return keybindsView;
         case "power":        return powerView;
         case "wallpaper":    return wallpaperView;
         case "notifcenter":  return notifCenterView;
@@ -145,6 +146,7 @@ Item {
     }
 
     Component { id: launcherView; LauncherView {} }
+    Component { id: keybindsView; KeybindsView {} }
     Component { id: statusView; StatusView {} }
     Component { id: wallpaperView; WallpaperView {} }
     Component { id: powerView; PowerView {} }

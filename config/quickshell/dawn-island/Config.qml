@@ -101,6 +101,18 @@ Singleton {
     /// so a narrow query makes it smaller rather than leaving empty rows.
     property int launcherMaxRows: 6
 
+    /// Keybind cheatsheet. Wider than the launcher because each row carries a
+    /// key chord and a sentence, and taller because it is read rather than
+    /// filtered — you scroll it instead of typing at it.
+    property int keybindsWidth: 620
+    property int keybindsHeaderHeight: 34
+    property int keybindsRowHeight: 32
+    property int keybindsMaxRows: 12
+    /// Ctrl+D / Ctrl+U step by this many rows.
+    property int keybindsPageSize: 6
+    /// Fixed column for the key chord so every description starts aligned.
+    property int keybindsChordWidth: 210
+
     /// Corner radii. A notch is square where it meets the bezel and generously
     /// rounded where it meets the desktop.
     property int cornerRadius: 22          // bottom corners
@@ -201,7 +213,11 @@ Singleton {
         /// Above the rest: if you asked to shut the machine down, nothing
         /// arriving afterwards is more important than that question.
         "power":        198,
-        "launcher":     200
+        "launcher":     200,
+        /// Level with the launcher: both are things you asked for explicitly,
+        /// and the cheatsheet exists to be readable while you decide what to
+        /// press next.
+        "keybinds":     200
     })
 
     // ─────────────────────────────────────────────────────────────────────
@@ -238,6 +254,9 @@ Singleton {
     property bool enableNotifications: true
 
     /// Show these in the expanded panel.
+    /// The keybind cheatsheet, read live from `hyprctl binds`.
+    property bool enableKeybinds: true
+
     property bool showClock: true
     property bool showCalendar: true
     property bool showBattery: true
@@ -265,6 +284,9 @@ Singleton {
     readonly property string wallpaperShortcut: "wallpaper"
     readonly property string notificationsShortcut: "notifications"
     readonly property string powerShortcut: "power"
+
+    /// The keybind cheatsheet. Bound in binds.lua to Ctrl+?.
+    readonly property string keybindsShortcut: "keybinds"
 
     /// Step sizes for the status panel's Left/Right keys.
     property real volumeKeyStep: 0.05

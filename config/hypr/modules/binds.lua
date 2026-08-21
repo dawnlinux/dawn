@@ -44,6 +44,17 @@ hl.bind(mainMod .. " + PERIOD", hl.dsp.global("quickshell:island"),
 -- Enter applies it through awww with a random transition.
 hl.bind(mainMod .. " + SHIFT + W", hl.dsp.global("quickshell:wallpaper"),
 	{ description = "Wallpaper Carousel (dawn-island)" })
+
+-- Every bind Hyprland knows about, read live from `hyprctl binds` — including
+-- anything added in ~/.config/dawn/local.lua. j/k to scroll.
+--
+-- NOT Ctrl+? — that cannot work. Typing `?` requires Shift, so the event
+-- arrives carrying both Ctrl and Shift, while a bind written as "CTRL +
+-- question" registers with the Ctrl modifier alone and never matches. Writing
+-- it as CTRL + SHIFT + slash would work but is a different chord on every
+-- keyboard layout.
+hl.bind("CTRL + K", hl.dsp.global("quickshell:keybinds"),
+	{ description = "Keybind cheatsheet" })
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd("~/.config/quickshell/dawn-island/launch.sh"),
 	{ description = "Restart Shell (dawn-island)" })
 -- The island owns org.freedesktop.Notifications now, so swaync is gone and

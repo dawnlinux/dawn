@@ -66,6 +66,13 @@ ShellRoot {
 
     GlobalShortcut {
         appid: "quickshell"
+        name: Config.keybindsShortcut
+        description: "Toggle the dawn-island keybind cheatsheet"
+        onPressed: Keybinds.toggle()
+    }
+
+    GlobalShortcut {
+        appid: "quickshell"
         name: Config.powerShortcut
         description: "Toggle the dawn-island session menu"
         onPressed: Session.toggle()
