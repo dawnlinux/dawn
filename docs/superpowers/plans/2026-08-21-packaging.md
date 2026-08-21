@@ -1753,8 +1753,8 @@ jobs:
       - name: Push
         run: |
           cd pacman-repo
-          git config user.name  'dawn-release'
-          git config user.email 'themarathondev7@gmail.com'
+          git config user.name  'jhayonline'
+          git config user.email 'jhaycodes999@gmail.com'
           git add -A
           git commit -m "release ${GITHUB_REF_NAME}"
           git push
