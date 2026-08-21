@@ -294,7 +294,7 @@ int apply_theme(const char *theme_name) {
       {"", "gtk.css", "/gtk-4.0", "gtk.css", true},
       {"", "hyprland.conf", "/hypr", "hyprland.conf", false},
       {"", "kitty.conf", "/kitty/colors", "colors.conf", false},
-      {"", "rofi.rasi", "/rofi/type-1/shared", "colors.rasi", false},
+      {"", "rofi.rasi", "/rofi", "colors.rasi", false},
       {"", "swaync.css", "/swaync/colors", "colors.css", false},
   };
 

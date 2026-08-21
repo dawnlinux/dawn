@@ -285,7 +285,7 @@ Everything below was already present on this machine; nothing was installed.
 | `systemd`        | `udevadm` — backlight change events     | yes, for brightness           |
 | `wl-clipboard`   | `wl-paste --watch` — copy events        | yes, for clipboard            |
 | `cliphist`       | clipboard _history_ for the picker      | optional                      |
-| `rofi`           | the clipboard picker UI                 | optional                      |
+| `rofi`           | the clipboard picker UI (not the launcher) | optional                   |
 | `networkmanager` | wifi / ethernet state                   | optional                      |
 | `bluez`          | bluetooth adapter and device state      | optional                      |
 | `awww`           | setting the wallpaper from the carousel | optional                      |

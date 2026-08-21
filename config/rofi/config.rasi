@@ -1,0 +1,92 @@
+/*
+ * The only rofi theme Dawn ships.
+ *
+ * rofi is NOT the app launcher — dawn-island draws its own (see
+ * `launcherWidth` in dawn-island/Config.qml). The single thing rofi is still
+ * used for is the clipboard picker on Super+V:
+ *
+ *     cliphist list | rofi -dmenu -p Clipboard | cliphist decode | wl-copy
+ *
+ * `rofi -dmenu` reads ~/.config/rofi/config.rasi with no -theme flag, which is
+ * why this file has that exact name and why there is only one of them.
+ *
+ * Colours live in colors.rasi so `dawn-theme` can rewrite them without
+ * touching the layout below.
+ */
+
+@import "colors.rasi"
+
+configuration {
+    show-icons:   false;
+    display-drun: "Apps";
+    me-select-entry: "";
+    me-accept-entry: "MousePrimary";
+}
+
+window {
+    /* Sized and rounded to read as a continuation of the island above it. */
+    width:            460px;
+    border-radius:    14px;
+    background-color: @background;
+    border:           1px;
+    border-color:     @border-colour;
+    padding:          8px;
+}
+
+mainbox {
+    children: [ inputbar, listview ];
+    spacing:  8px;
+}
+
+inputbar {
+    children:         [ prompt, entry ];
+    background-color: @background-alt;
+    border-radius:    10px;
+    padding:          10px 12px;
+    spacing:          8px;
+}
+
+prompt {
+    background-color: transparent;
+    text-color:       @foreground-dim;
+}
+
+entry {
+    background-color: transparent;
+    text-color:       @foreground;
+    placeholder:      "";
+    cursor:           text;
+}
+
+listview {
+    /* Matches launcherMaxRows in the island so both lists feel the same. */
+    lines:            6;
+    columns:          1;
+    scrollbar:        false;
+    background-color: transparent;
+    spacing:          2px;
+}
+
+element {
+    /* 44px to match launcherRowHeight in the island. */
+    padding:          0 12px;
+    children:         [ element-text ];
+    border-radius:    10px;
+    background-color: transparent;
+    cursor:           pointer;
+}
+
+element-text {
+    vertical-align:   0.5;
+    background-color: transparent;
+    text-color:       inherit;
+}
+
+element normal.normal {
+    text-color: @foreground-dim;
+}
+
+element selected.normal {
+    background-color: @background-hover;
+    text-color:       @foreground;
+}

@@ -1,0 +1,17 @@
+/*
+ * Dawn palette for rofi.
+ *
+ * Overwritten by `dawn-theme <name>` when a theme is applied; the values here
+ * are the built-in "dawn" monochrome palette and match
+ * config/quickshell/dawn-island/theme/Theme.qml. Keep the two in sync — the
+ * clipboard picker sits directly under the island, so a mismatch is visible.
+ */
+* {
+    background:       #000000;
+    background-alt:   #161616;
+    background-hover: #202020;
+    foreground:       #f2f2f2;
+    foreground-dim:   #8f8f8f;
+    accent:           #f2f2f2;
+    border-colour:    #2b2b2b;
+}
