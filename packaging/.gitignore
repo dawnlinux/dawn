@@ -1,0 +1,7 @@
+# makepkg working directories and output
+src/
+pkg/
+*.pkg.tar.zst
+*.pkg.tar.zst.sig
+dawn-*/
+typist-target/

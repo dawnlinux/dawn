@@ -1,0 +1,183 @@
+# Maintainer: jhayonline <jhaycodes999@gmail.com>
+#
+# Three packages from one build:
+#
+#   dawn          meta — pulls in the whole desktop
+#   dawn-config   the config tree, the CLI, and the greetd integration
+#   dawn-typist   the typing test
+#
+# All three share one pkgver. A split PKGBUILD cannot version its packages
+# independently — pkgver belongs to pkgbase — so typist versions with Dawn.
+# That is accepted: it ships as part of Dawn, and a separate PKGBUILD purely
+# for an independent version number would duplicate the release pipeline.
+#
+# Building locally against a checkout rather than the tag:
+#
+#     DAWN_LOCAL_SOURCE=1 makepkg --syncdeps --cleanbuild
+#
+# which is how this is tested before a tag exists.
+
+pkgbase=dawn
+pkgname=(dawn dawn-config dawn-typist)
+pkgver=1.0.0
+pkgrel=1
+arch=('x86_64')
+url='https://github.com/dawnlinux/dawn'
+license=('MIT')
+makedepends=('git' 'cargo')
+
+# DAWN_LOCAL_SOURCE builds from the working tree instead of the published tag,
+# so the packaging can be verified before a release exists. Releases always
+# build from the tag; the workflow never sets this.
+if [ -n "${DAWN_LOCAL_SOURCE:-}" ]; then
+	source=()
+	sha256sums=()
+else
+	source=("$pkgbase-$pkgver::git+https://github.com/dawnlinux/dawn.git#tag=v$pkgver")
+	sha256sums=('SKIP')
+fi
+
+# Where the sources live, resolved at CALL time rather than at parse time.
+#
+# $srcdir only exists while makepkg is running. Referencing it at top level
+# breaks every tool that merely sources this file to read its metadata —
+# `makepkg --printsrcinfo`, and packaging/check-depends.sh — because under
+# `set -u` the unbound variable aborts the source before depends can be read.
+_dawn_srcdir() {
+	if [ -n "${DAWN_LOCAL_SOURCE:-}" ]; then
+		(cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")/.." && pwd)
+	else
+		printf '%s\n' "$srcdir/$pkgbase-$pkgver"
+	fi
+}
+
+# The runtime dependency list, kept in lockstep with install/packages.txt by
+# packaging/check-depends.sh.
+#
+# It cannot be generated FROM that file: makepkg parses depends=() to resolve
+# dependencies before sources are fetched, so $srcdir does not exist yet.
+_dawn_depends=(
+	# Compositor and shell
+	hyprland
+	quickshell
+	hyprlock
+	xdg-desktop-portal-hyprland
+
+	# Terminal, shell and editor
+	kitty
+	fish
+	starship
+	neovim
+
+	# Desktop utilities
+	rofi
+	awww
+	cliphist
+	wl-clipboard
+	wtype
+	flameshot
+	nautilus
+
+	# Media pipeline
+	pipewire
+	pipewire-pulse
+	wireplumber
+	playerctl
+	ffmpeg
+
+	# Hardware control
+	brightnessctl
+	upower
+	bluez
+	bluez-utils
+	networkmanager
+
+	# Fonts
+	inter-font
+	ttf-jetbrains-mono-nerd
+	ttf-firacode-nerd
+
+	# Login screen
+	greetd
+
+	# Everyday
+	firefox
+	fastfetch
+)
+
+prepare() {
+	cd "$(_dawn_srcdir)/tools/typist"
+	cargo fetch --locked --target "$(rustc -vV | sed -n 's/^host: //p')"
+}
+
+build() {
+	cd "$(_dawn_srcdir)/tools/typist"
+	export RUSTUP_TOOLCHAIN=stable
+	export CARGO_TARGET_DIR="$srcdir/typist-target"
+	cargo build --frozen --release
+}
+
+check() {
+	cd "$(_dawn_srcdir)"
+	# Fail the build, not the user's install, if the two dependency lists
+	# have drifted apart.
+	./packaging/check-depends.sh
+}
+
+package_dawn() {
+	pkgdesc='Where your system comes to life — an Arch desktop on Hyprland and Quickshell'
+	arch=('any')
+	depends=('dawn-config' "${_dawn_depends[@]}")
+
+	install -Dm644 "$(_dawn_srcdir)/LICENSE" "$pkgdir/usr/share/licenses/dawn/LICENSE"
+}
+
+package_dawn-config() {
+	pkgdesc='Dawn desktop configuration and the dawn link manager'
+	arch=('any')
+	# This package ships a Quickshell shell written in QML, so it needs the
+	# runtime that executes it — not just bash for the CLI. Listed directly
+	# rather than leaning on the `dawn` meta-package, because installing
+	# dawn-config on its own has to produce something that actually runs.
+	depends=('bash' 'quickshell' 'qt6-declarative')
+	optdepends=('greetd: for the dawn-greet login screen')
+
+	cd "$(_dawn_srcdir)"
+
+	# The config tree. greetd is pulled out of it because it is never linked
+	# into ~/.config — it installs to /etc by its own script, since the
+	# greeter runs as a user that cannot read your home directory.
+	install -d "$pkgdir/usr/share/dawn"
+	cp -a config "$pkgdir/usr/share/dawn/config"
+	rm -rf "$pkgdir/usr/share/dawn/config/greetd"
+	cp -a config/greetd "$pkgdir/usr/share/dawn/greetd"
+
+	# Seed sources for ~/.config/dawn.
+	cp -a examples "$pkgdir/usr/share/dawn/examples"
+
+	# Everything under /usr/share is read-only to the user by design; the CLI
+	# chmods the copies it seeds into their home.
+	find "$pkgdir/usr/share/dawn" -type d -exec chmod 755 {} +
+	find "$pkgdir/usr/share/dawn" -type f -exec chmod 644 {} +
+	chmod 755 "$pkgdir/usr/share/dawn/greetd/install.sh"
+	chmod 755 "$pkgdir/usr/share/dawn/config/quickshell/dawn-island/launch.sh"
+
+	# Empty directories left over from the source tree — fish's unused
+	# conf.d/functions/completions, and nvim's stale notes/templates. They
+	# carry nothing, and shipping them makes pacman own paths Dawn does not
+	# use. Pruned depth-first so a directory emptied by this loop also goes.
+	find "$pkgdir/usr/share/dawn" -depth -type d -empty -delete
+
+	install -Dm755 packaging/dawn "$pkgdir/usr/bin/dawn"
+	install -Dm644 LICENSE "$pkgdir/usr/share/licenses/dawn-config/LICENSE"
+}
+
+package_dawn-typist() {
+	pkgdesc='A minimal typing test for Wayland'
+	# Taken from `ldd` on the built binary, not guessed: smithay-client-toolkit
+	# pulls in libxkbcommon for keyboard handling. namcap errors without it.
+	depends=('libxkbcommon' 'gcc-libs' 'glibc')
+
+	install -Dm755 "$srcdir/typist-target/release/typist" "$pkgdir/usr/bin/typist"
+	install -Dm644 "$(_dawn_srcdir)/LICENSE" "$pkgdir/usr/share/licenses/dawn-typist/LICENSE"
+}
