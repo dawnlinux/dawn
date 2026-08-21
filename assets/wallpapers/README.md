@@ -8,10 +8,16 @@ where the island's wallpaper carousel reads from (`wallpaperDir` in
 
 | File | |
 |---|---|
-| `dawn-black.png` | Arch mark, white on black. 1920×1080. The default. |
+| `torii-ember.png` | A torii gate against a setting sun. **The default.** |
+| `dawn-black.png` | Arch mark, white on black. 1920×1080. |
 | `dawn-white.png` | Arch mark, black on white. 1890×1080. |
 
-Both are deliberately monochrome, and that has a consequence worth knowing.
+`torii-ember.png` ships as the default because a distribution named Dawn
+should open on sunrise colours. Under `scheme-tonal-spot` it yields a warm
+near-black surface (`#19120d`) and an amber accent (`#ffb781`).
+
+The two Arch-mark wallpapers are deliberately monochrome, and that has a
+consequence worth knowing.
 
 ## Monochrome wallpapers and the colour engine
 
@@ -33,8 +39,11 @@ cyan.
 `dawn-black.png` it lands on a near-black surface with a white accent — which
 is Dawn's original hand-tuned identity, generated rather than hardcoded.
 
-That pairing is why these ship: out of the box Dawn looks like Dawn, and the
-moment you pick a photograph it becomes Material You.
+That is why `scheme-monochrome` exists as an option but is not the default:
+it is the only way to get a genuinely neutral desktop, and the Arch-mark
+wallpapers are the images it suits. It has one real cost — under monochrome
+the editor colourscheme loses hue differentiation entirely, and strings come
+out the same colour as ordinary text.
 
 ## Adding your own
 

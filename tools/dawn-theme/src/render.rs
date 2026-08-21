@@ -160,7 +160,7 @@ mod tests {
     #[test]
     fn scheme_mode_and_config_are_always_sent() {
         let a = args(&Theme::default(), &cfg());
-        assert_eq!(flag(&a, "--type"), Some("scheme-monochrome"));
+        assert_eq!(flag(&a, "--type"), Some("scheme-tonal-spot"));
         assert_eq!(flag(&a, "--mode"), Some("dark"));
         assert_eq!(flag(&a, "--config"), Some("/tmp/config.toml"));
     }
@@ -209,7 +209,7 @@ mod against_real_matugen {
         }
 
         let wallpaper = PathBuf::from(std::env::var("HOME").unwrap())
-            .join("Pictures/Wallpapers/dawn-black.png");
+            .join("Pictures/Wallpapers/torii-ember.png");
         if !wallpaper.exists() {
             eprintln!("no shipped wallpaper to test with — skipping");
             return;

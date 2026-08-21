@@ -10,28 +10,29 @@
 --
 -- ── Minimal on purpose ────────────────────────────────────────────────────
 --
--- About twenty groups, not eighty. This exists to answer one question before
--- more work goes into it: is a wallpaper-derived syntax theme actually
--- pleasant to read? Under a colourful scheme the answer looks like yes. Under
--- `scheme-monochrome` — Dawn's default — primary, secondary and tertiary are
--- three near-identical light greys, so syntax is differentiated almost
--- entirely by bold and italic rather than by hue. That is a deliberate
--- monochrome editor, in the spirit of `plain`, and it is the thing to judge.
+-- About twenty groups, not eighty. It was written to answer one question
+-- before more work went into it: is a wallpaper-derived syntax theme actually
+-- readable?
+--
+-- Under a colourful scheme, yes. Under `scheme-monochrome` primary, secondary
+-- and tertiary collapse to three near-identical greys and String comes out the
+-- same colour as ordinary text — which is a large part of why monochrome is
+-- not the shipped default.
 --
 -- If it reads well, the remaining groups (Treesitter @*, LSP semantic tokens,
 -- git signs, telescope, cmp) are mechanical from the same palette.
 
 local FALLBACK = {
-	bg = "#131313",
-	bgAlt = "#1f1f1f",
-	bgHigh = "#2a2a2a",
-	sel = "#353535",
-	fg = "#e2e2e2",
-	fgDim = "#c6c6c6",
-	muted = "#919191",
-	primary = "#ffffff",
-	secondary = "#c6c6c6",
-	tertiary = "#e2e2e2",
+	bg = "#19120d",
+	bgAlt = "#261e18",
+	bgHigh = "#312822",
+	sel = "#3c332d",
+	fg = "#f0dfd6",
+	fgDim = "#d6c3b7",
+	muted = "#9f8d82",
+	primary = "#ffb781",
+	secondary = "#d6c3b7",
+	tertiary = "#c7ca95",
 	error = "#ffb4ab",
 	warn = "#e8c07d",
 	ok = "#7ec699",
@@ -92,8 +93,8 @@ hl("PmenuSel", { fg = c.fg, bg = c.sel, bold = true })
 
 -- ── Syntax ────────────────────────────────────────────────────────────────
 --
--- Under a monochrome palette these hues converge, so weight and slant carry
--- the distinction instead. That is the point of the experiment.
+-- Bold and italic carry as much of the distinction as hue does, so the scheme
+-- degrades gracefully when a wallpaper yields a narrow palette.
 hl("Comment", { fg = c.muted, italic = true })
 hl("String", { fg = c.tertiary })
 hl("Character", { fg = c.tertiary })

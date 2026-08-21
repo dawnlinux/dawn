@@ -15,7 +15,7 @@ use std::path::{Path, PathBuf};
 /// ```toml
 /// [source]
 /// kind = "wallpaper"
-/// path = "/home/you/Pictures/Wallpapers/dawn-black.png"
+/// path = "/home/you/Pictures/Wallpapers/torii-ember.png"
 /// ```
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "kind", rename_all = "lowercase")]
@@ -38,9 +38,13 @@ pub struct Theme {
 impl Default for Theme {
     /// Dawn's shipped identity.
     ///
-    /// `scheme-monochrome` on `dawn-black.png` produces a near-black surface
-    /// with a white accent, which is the palette the island was originally
-    /// hand-tuned to — so a first run looks like a first boot.
+    /// `scheme-tonal-spot` on `torii-ember.png` — a torii gate against a
+    /// setting sun — gives a warm near-black surface with an amber accent.
+    /// A distribution named Dawn opening on sunrise colours is the point.
+    ///
+    /// tonal-spot rather than monochrome because the wallpaper has colour in
+    /// it: monochrome would discard all of it, and it leaves the editor with
+    /// three identical greys for strings, functions and keywords.
     ///
     /// The wallpaper is addressed in `~/Pictures/Wallpapers` rather than under
     /// `/usr/share`, because `dawn link` seeds it there in BOTH package and
@@ -49,9 +53,9 @@ impl Default for Theme {
     fn default() -> Self {
         Theme {
             source: Source::Wallpaper {
-                path: home().join("Pictures/Wallpapers/dawn-black.png"),
+                path: home().join("Pictures/Wallpapers/torii-ember.png"),
             },
-            scheme: "scheme-monochrome".into(),
+            scheme: "scheme-tonal-spot".into(),
             mode: "dark".into(),
             contrast: 0.0,
         }
@@ -178,7 +182,7 @@ mod tests {
     fn missing_state_falls_back_to_the_default_rather_than_failing() {
         // A fresh install has no theme.toml and must still produce a desktop.
         let back = Theme::load_from(&tmp().join("does-not-exist"));
-        assert_eq!(back.scheme, "scheme-monochrome");
+        assert_eq!(back.scheme, "scheme-tonal-spot");
         assert_eq!(back.mode, "dark");
     }
 
@@ -186,7 +190,7 @@ mod tests {
     fn corrupt_state_falls_back_rather_than_failing() {
         let dir = tmp();
         std::fs::write(dir.join("theme.toml"), b"this is not toml {{{").unwrap();
-        assert_eq!(Theme::load_from(&dir).scheme, "scheme-monochrome");
+        assert_eq!(Theme::load_from(&dir).scheme, "scheme-tonal-spot");
     }
 
     #[test]
@@ -196,7 +200,7 @@ mod tests {
         match Theme::default().source {
             Source::Wallpaper { path: p } => {
                 assert!(
-                    p.ends_with("Pictures/Wallpapers/dawn-black.png"),
+                    p.ends_with("Pictures/Wallpapers/torii-ember.png"),
                     "got {p:?}"
                 );
                 assert!(!p.starts_with("/usr/share"));
@@ -221,7 +225,7 @@ mod shape {
         let body = toml::to_string_pretty(&Theme::default()).unwrap();
         println!("{body}");
         assert!(body.contains("kind = \"wallpaper\""));
-        assert!(body.contains("scheme = \"scheme-monochrome\""));
+        assert!(body.contains("scheme = \"scheme-tonal-spot\""));
     }
 }
 

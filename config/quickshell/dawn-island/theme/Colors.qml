@@ -26,9 +26,12 @@ import Quickshell.Io
  *
  * They are the palette a fresh install runs on, before dawn-theme has been
  * invoked for the first time and while colors.json does not exist. They are
- * Dawn's original hand-tuned identity, which is also what `scheme-monochrome`
- * on dawn-black.png reproduces — so first boot and first theme run look the
- * same.
+ * exactly what `scheme-tonal-spot` on torii-ember.png produces — the shipped
+ * default — so first boot and first theme run look identical.
+ *
+ * Regenerate them with:
+ *   matugen -j hex --dry-run --prefer saturation -t scheme-tonal-spot \
+ *     image assets/wallpapers/torii-ember.png
  *
  * Separate from Theme.qml because Theme.qml holds sizes, radii and spacing
  * that are hand-tuned: colours change with the wallpaper, 8px of padding does
@@ -58,33 +61,34 @@ Singleton {
             id: palette
 
             // ── Surfaces ──────────────────────────────────────────────────
-            /// The notch itself. Pure black by default and it matters: a true
-            /// black reads as absence-of-screen rather than as a widget.
-            property string background: "#000000"
-            property string surface: "#161616"
-            property string surfaceHigh: "#202020"
-            property string surfaceHighest: "#2b2b2b"
+            /// The notch itself. A very dark warm brown rather than pure
+            /// black: Material You tints even its darkest surface with the
+            /// wallpaper's hue, and torii-ember is a sunset.
+            property string background: "#19120d"
+            property string surface: "#261e18"
+            property string surfaceHigh: "#312822"
+            property string surfaceHighest: "#3c332d"
 
             // ── Overlay bases ─────────────────────────────────────────────
             /// Tinted by the palette but applied at low alpha by Theme.qml.
             /// The alpha belongs to the design, not the palette — a solid
             /// outline colour would replace a hairline with a visible border.
-            property string borderBase: "#ffffff"
-            property string highlightBase: "#ffffff"
+            property string borderBase: "#52443b"
+            property string highlightBase: "#9f8d82"
 
             property string shadow: "#000000"
 
             // ── Text ──────────────────────────────────────────────────────
-            property string text: "#f2f2f2"
-            property string textSecondary: "#b8b8b8"
-            property string textTertiary: "#8f8f8f"
-            property string textQuaternary: "#5a5a5a"
+            property string text: "#f0dfd6"
+            property string textSecondary: "#d6c3b7"
+            property string textTertiary: "#9f8d82"
+            property string textQuaternary: "#52443b"
 
             // ── Accent ────────────────────────────────────────────────────
-            property string accentBase: "#f2f2f2"
+            property string accentBase: "#ffb781"
             /// A filled accent surface and legible text on top of it.
-            property string accentContainer: "#2b2b2b"
-            property string onAccent: "#000000"
+            property string accentContainer: "#6d3a09"
+            property string onAccent: "#4e2600"
 
             // ── Semantic ──────────────────────────────────────────────────
             /// NOT derived from the wallpaper. Material You defines an error
@@ -93,8 +97,8 @@ Singleton {
             property string positive: "#7ec699"
             property string warning: "#e8c07d"
 
-            property string danger: "#d9534f"
-            property string weekend: "#e07a76"
+            property string danger: "#ffb4ab"
+            property string weekend: "#c7ca95"
         }
     }
 

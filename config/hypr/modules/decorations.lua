@@ -13,10 +13,10 @@
 -- with no window borders because a colour file was missing would be a poor
 -- first impression.
 local palette = {
-	activeBorder   = "rgb(aaacac)",
-	inactiveBorder = "rgb(000000)",
+	activeBorder   = "rgb(ffb781)",
+	inactiveBorder = "rgb(261e18)",
 	shadow         = "rgb(000000)",
-	background     = "rgb(000000)",
+	background     = "rgb(19120d)",
 }
 
 local chunk = loadfile(os.getenv("HOME") .. "/.config/dawn/generated/hyprland-colors.lua")
@@ -80,13 +80,13 @@ hl.config({
 		rounding           = 10,
 		rounding_power     = 2,
 
-		-- inactive_opacity   = 0.88,
-		-- active_opacity     = 0.88,
-		-- fullscreen_opacity = 0.88,
+		inactive_opacity   = 0.88,
+		active_opacity     = 0.88,
+		fullscreen_opacity = 0.88,
 
-		inactive_opacity   = 1,
-		active_opacity     = 1,
-		fullscreen_opacity = 1,
+		-- inactive_opacity   = 1,
+		-- active_opacity     = 1,
+		-- fullscreen_opacity = 1,
 
 		shadow             = {
 			enabled      = true,
