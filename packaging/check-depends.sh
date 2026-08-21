@@ -37,11 +37,18 @@ manifest="$(awk '!/^[[:space:]]*#/ && NF {print $1}' "$MANIFEST" | sort -u)"
 #         Bash 4.4+ expands an unset array under `set -u` to nothing rather
 #         than erroring, so a PKGBUILD without it yields an empty string and
 #         is caught by the guard below instead of dying mid-script.
+# `if !` rather than a bare assignment: under `set -e` a failing command
+# substitution kills the script instantly, with no message and exit 1 — which
+# is indistinguishable from "the lists differ". Catching it here turns a
+# PKGBUILD that cannot even be sourced into exit 2 and a sentence saying so.
 # shellcheck disable=SC1090,SC2154
-pkgbuild="$(
+if ! pkgbuild="$(
 	source "$PKGBUILD" >/dev/null 2>&1
 	printf '%s\n' "${_dawn_depends[@]}" | sort -u
-)"
+)"; then
+	echo "could not source $PKGBUILD to read _dawn_depends" >&2
+	exit 2
+fi
 
 if [ -z "$pkgbuild" ]; then
 	echo "PKGBUILD defines no _dawn_depends array: $PKGBUILD" >&2
