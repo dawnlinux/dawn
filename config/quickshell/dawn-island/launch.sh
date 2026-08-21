@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Restart dawn-island. Bound to Super+R, replacing the old waybar launcher.
+# Restart dawn-island. Bound to Super+R.
 #
 # Note that you rarely need this: Quickshell hot-reloads whenever a file under
 # ~/.config/quickshell/dawn-island changes, so editing the config already

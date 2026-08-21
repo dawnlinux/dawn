@@ -188,7 +188,7 @@ These are Hyprland binds that sit next to the island's and are easy to confuse:
 | Key | Owner | Does |
 | --- | --- | --- |
 | `Super+W` | Hyprland | Close window — *not* the wallpaper carousel (`Super+Shift+W`) |
-| `Super+N` | dawn-island | Notification centre — was swaync until swaync was retired |
+| `Super+N` | dawn-island | Notification centre |
 | `Super+R` | dawn-island | Restart the shell — rarely needed, Quickshell hot-reloads on save |
 | `Super+M` | dawn-island | Session menu — used to be a straight-to-shutdown bind with no confirmation |
 
