@@ -76,7 +76,7 @@ declare -A STRATEGY=(
 # to own — which is the bug this strategy exists to prevent.
 declare -A ENTRIES=(
 	[fish]="config.fish"
-	[nvim]="init.lua lua dap.txt KEYBINDINGS.md README.md showcase"
+	[nvim]="init.lua lua colors dap.txt KEYBINDINGS.md README.md showcase"
 	[quickshell]="dawn-island dawn-greet"
 )
 

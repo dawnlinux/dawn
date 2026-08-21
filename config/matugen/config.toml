@@ -42,3 +42,8 @@ output_path = '~/.config/dawn/generated/rofi-colors.rasi'
 [templates.hyprland]
 input_path  = '~/.config/dawn/templates/hyprland-colors.lua'
 output_path = '~/.config/dawn/generated/hyprland-colors.lua'
+
+# The editor. colors/dawn.lua reads this and builds highlight groups from it.
+[templates.nvim]
+input_path  = '~/.config/dawn/templates/nvim-colors.lua'
+output_path = '~/.config/dawn/generated/nvim-colors.lua'

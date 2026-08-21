@@ -104,8 +104,16 @@ M.items = {
 	},
 }
 
+--- Colourschemes that ship with this configuration rather than as plugins.
+---
+--- `colors/dawn.lua` is already on the runtimepath, so there is nothing for
+--- lazy.nvim to install. It is deliberately NOT in `M.items`: that table
+--- builds plugin specs in engine/plugins/colorscheme.lua, where an entry with
+--- no `repo` produces `{ nil, lazy = true }` and lazy rejects the whole spec.
+M.builtin = { "dawn" }
+
 function M.names()
-	local names = {}
+	local names = vim.list_slice(M.builtin)
 
 	for _, item in ipairs(M.items) do
 		vim.list_extend(names, item.schemes)
