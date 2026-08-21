@@ -292,7 +292,6 @@ int apply_theme(const char *theme_name) {
       {"", "colors.conf", "", "colors.conf", false},
       {"", "gtk.css", "/gtk-3.0", "gtk.css", true},
       {"", "gtk.css", "/gtk-4.0", "gtk.css", true},
-      {"", "waybar.css", "/waybar", "waybar-colors.css", false},
       {"", "hyprland.conf", "/hypr", "hyprland.conf", false},
       {"", "kitty.conf", "/kitty/colors", "colors.conf", false},
       {"", "rofi.rasi", "/rofi/type-1/shared", "colors.rasi", false},
@@ -427,7 +426,6 @@ int apply_theme(const char *theme_name) {
   // Reload services
   printf("Reloading services...\n");
   (void)!system("hyprctl reload 2>/dev/null");
-  (void)!system("pkill -SIGUSR2 waybar 2>/dev/null");
   (void)!system("pkill -SIGUSR2 swaync 2>/dev/null");
   printf("✓ Services reloaded\n");
 

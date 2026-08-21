@@ -36,26 +36,11 @@ hl.exec_cmd("qs -p ~/.config/quickshell/dawn-island/shell.qml")
 ### Super+R restarts it
 
 `~/.config/hypr/modules/binds.lua` now points Super+R at
-`~/.config/quickshell/dawn-island/launch.sh` instead of waybar's launcher. The
-script reloads `hyprland.conf` and restarts the shell, matching what the old
-bind did.
+`~/.config/quickshell/dawn-island/launch.sh`. The script reloads
+`hyprland.conf` and restarts the shell.
 
 You rarely need it — Quickshell hot-reloads whenever a file in this directory
 changes, so editing `Config.qml` updates the running island immediately.
-
-### Going back to waybar
-
-Nothing about waybar was deleted; `~/.config/waybar/` and its `launch.sh` are
-untouched, and `waybar.service` is still installed (disabled, as it already
-was). To restore it:
-
-1. Uncomment `hl.exec_cmd("waybar")` in `~/.config/hypr/modules/autostart.lua`
-2. Comment out the `qs -p ...` line above it, **or** set `exclusiveZone: 0` in
-   `Config.qml` so the island stops reserving the top edge and the two can
-   coexist
-3. Optionally point Super+R back at `~/.config/waybar/launch.sh`
-
-Running both without step 2 stacks two bars on the top edge.
 
 ---
 

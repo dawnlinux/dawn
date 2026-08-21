@@ -1,21 +1,27 @@
 -------------------
 ---- AUTOSTART ----
 -------------------
+--
+-- Everything Hyprland launches once, at compositor start.
+--
+-- Keep this list short. Each entry here is a process that runs for the whole
+-- session on every boot, so anything that could be started on demand instead
+-- does not belong in this file.
 
-hl.on("hyprland.start", function ()
-  -- dawn-island: the Dynamic Island shell. Replaces waybar's top bar.
-  hl.exec_cmd("qs -p ~/.config/quickshell/dawn-island/shell.qml")
+hl.on("hyprland.start", function()
+	-- dawn-island: the shell. Owns the top edge — status bar, app launcher,
+	-- media controls, the session menu and the wallpaper carousel are all in
+	-- here, so this single process replaces what would otherwise be a bar, a
+	-- launcher and a power menu.
+	hl.exec_cmd("qs -p ~/.config/quickshell/dawn-island/shell.qml")
 
-  -- waybar is disabled because dawn-island now owns the top edge and reserves
-  -- an exclusive zone there; running both stacks two bars on top of each other.
-  -- Uncomment to go back to waybar (and set exclusiveZone = 0 in the island's
-  -- Config.qml, or drop the island line above).
-  -- hl.exec_cmd("waybar")
+	-- swaync owns org.freedesktop.Notifications and draws the notification
+	-- popups and centre. Only one process can own that bus name, so if the
+	-- island ever serves notifications itself, this line goes.
+	hl.exec_cmd("swaync")
 
-  -- swaync keeps org.freedesktop.Notifications. The island can serve
-  -- notifications itself instead — only one process can own that bus name, so
-  -- comment this out if you want notifications inside the island.
-  hl.exec_cmd("swaync")
-
-  hl.exec_cmd("awww-daemon")
+	-- awww-daemon: the wallpaper daemon. The island's wallpaper carousel
+	-- talks to it, and it is what publishes the current wallpaper to the
+	-- login screen (see config/greetd/install.sh).
+	hl.exec_cmd("awww-daemon")
 end)

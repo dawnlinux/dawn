@@ -6,7 +6,7 @@ import Quickshell
 /*
  * Every colour and elevation in the shell. Change it here, it changes
  * everywhere. Tuned to match the monochrome "dawn" palette already used by
- * the rest of this desktop (waybar-colors.css).
+ * the rest of this desktop.
  */
 Singleton {
     id: root
